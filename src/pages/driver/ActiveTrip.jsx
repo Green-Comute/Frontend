@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { tripService } from '../../services/tripService';
 import { rideService } from '../../services/rideService';
 import LiveTrackingMap from '../../components/LiveTrackingMap';
+import TripSummary from '../../components/TripSummary';
 import { io } from 'socket.io-client';
 
 const ActiveTrip = () => {
@@ -14,6 +15,7 @@ const ActiveTrip = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [pickupLoading, setPickupLoading] = useState({});
   const [passengerCancelAlert, setPassengerCancelAlert] = useState(null);
+  const [showSummary, setShowSummary] = useState(false);
 
   // Get user from localStorage - try multiple keys
   const getUserData = () => {
@@ -97,15 +99,18 @@ const ActiveTrip = () => {
       await tripService.completeTrip(tripId);
       await fetchTripDetails(); // Refresh trip data
 
-      // Redirect after 2 seconds
-      setTimeout(() => {
-        navigate('/driver/requests');
-      }, 2000);
+      // Show summary modal instead of redirecting immediately
+      setShowSummary(true);
     } catch (err) {
       setError(err.message || 'Failed to complete trip');
     } finally {
       setActionLoading(false);
     }
+  };
+
+  const handleCloseSummary = () => {
+    setShowSummary(false);
+    navigate('/driver/requests');
   };
 
   const handleCancelTrip = async () => {
@@ -307,6 +312,16 @@ const ActiveTrip = () => {
                     </button>
                   </div>
                 )}
+                {trip.status === 'COMPLETED' && (
+                  <div className="pt-3">
+                    <button
+                      onClick={() => setShowSummary(true)}
+                      className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    >
+                      📊 View Trip Summary
+                    </button>
+                  </div>
+                )}
                 {isDriver && trip.status === 'SCHEDULED' && (
                   <div>
                     <button
@@ -412,6 +427,14 @@ const ActiveTrip = () => {
           userRole={isDriver ? 'driver' : 'passenger'}
         />
       </div>
+
+      {/* Trip Summary Modal */}
+      {showSummary && (
+        <TripSummary
+          tripId={tripId}
+          onClose={handleCloseSummary}
+        />
+      )}
     </div>
   );
 };
