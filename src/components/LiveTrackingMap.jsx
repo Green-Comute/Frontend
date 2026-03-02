@@ -114,6 +114,7 @@ ETACard.propTypes = {
 const LiveTrackingMap = ({ trip, userRole }) => {
   const [driverLocation, setDriverLocation] = useState(null);
   const [socket, setSocket] = useState(null);
+  const [socketConnected, setSocketConnected] = useState(false);
   const [isTracking, setIsTracking] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
   const [error, setError] = useState('');
@@ -195,8 +196,14 @@ const LiveTrackingMap = ({ trip, userRole }) => {
     const newSocket = io('http://localhost:5000', { auth: { token } });
 
     newSocket.on('connect', () => {
-      console.log('Connected to tracking socket');
+      console.log('✅ Connected to tracking socket');
+      setSocketConnected(true);
       newSocket.emit('joinTrip', trip._id);
+    });
+
+    newSocket.on('disconnect', () => {
+      console.log('❌ Disconnected from tracking socket');
+      setSocketConnected(false);
     });
 
     newSocket.on('locationUpdate', (data) => {
@@ -232,8 +239,8 @@ const LiveTrackingMap = ({ trip, userRole }) => {
     });
 
     newSocket.on('error', (err) => {
-      console.error('Socket error:', err);
-      setError(err.message);
+      console.error('❌ Socket error:', err);
+      setError(err.message || 'Socket connection error');
     });
 
     setSocket(newSocket);
@@ -243,33 +250,60 @@ const LiveTrackingMap = ({ trip, userRole }) => {
         newSocket.emit('leaveTrip', trip._id);
         newSocket.disconnect();
       }
+      // Clean up simulation on unmount
+      if (simulationInterval) {
+        clearInterval(simulationInterval);
+      }
     };
   }, [trip._id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Driver: watch real GPS position ──
   useEffect(() => {
-    if (userRole !== 'driver' || !socket || trip.status !== 'STARTED') return;
+    if (userRole !== 'driver' || !socket || !socketConnected || trip.status !== 'STARTED') {
+      return;
+    }
 
     let watchId;
 
     const startTracking = () => {
       if ('geolocation' in navigator) {
+        console.log('🎯 Starting real GPS tracking...');
         watchId = navigator.geolocation.watchPosition(
           (position) => {
             const location = {
               lat: position.coords.latitude,
               lng: position.coords.longitude
             };
+            console.log('📍 GPS Update:', location);
             setDriverLocation(location);
-            socket.emit('updateLocation', { tripId: trip._id, location });
+            
+            if (socket && socketConnected) {
+              socket.emit('updateLocation', { tripId: trip._id, location });
+              console.log('✅ Location sent to server');
+            }
             setIsTracking(true);
+            setError(''); // Clear any previous errors
           },
           (err) => {
-            console.error('Geolocation error:', err);
-            setError('Failed to get location. Please enable location services.');
+            console.error('❌ Geolocation error:', err);
+            let errorMsg = 'Failed to get location. ';
+            switch(err.code) {
+              case err.PERMISSION_DENIED:
+                errorMsg += 'Location permission denied. Please allow location access.';
+                break;
+              case err.POSITION_UNAVAILABLE:
+                errorMsg += 'Location information unavailable.';
+                break;
+              case err.TIMEOUT:
+                errorMsg += 'Location request timed out.';
+                break;
+              default:
+                errorMsg += 'Unknown location error.';
+            }
+            setError(errorMsg);
             setIsTracking(false);
           },
-          { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+          { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
         );
       } else {
         setError('Geolocation not supported by your browser');
@@ -279,13 +313,20 @@ const LiveTrackingMap = ({ trip, userRole }) => {
     startTracking();
 
     return () => {
-      if (watchId) navigator.geolocation.clearWatch(watchId);
-      if (simulationInterval) clearInterval(simulationInterval);
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+        console.log('🛑 Stopped GPS tracking');
+      }
     };
-  }, [socket, trip._id, trip.status, userRole]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [socket, socketConnected, trip._id, trip.status, userRole]);
 
   // ── Driver: simulate movement along the ACTUAL road route ──
   const startSimulation = async () => {
+    if (!socket || !socketConnected) {
+      setError('Cannot simulate - not connected to server');
+      return;
+    }
+
     if (!trip.sourceLocation || !trip.destinationLocation) {
       setError('Cannot simulate - missing location data');
       return;
@@ -360,16 +401,21 @@ const LiveTrackingMap = ({ trip, userRole }) => {
         clearInterval(interval);
         setSimulationInterval(null);
         setIsSimulating(false);
+        console.log('✅ Simulation completed');
         return;
       }
 
       const location = displayPoints[stepIdx];
       stepIdx++;
 
+      console.log(`🧪 Simulation step ${stepIdx}/${displayPoints.length}:`, location);
       setDriverLocation(location);
 
-      if (socket) {
+      if (socket && socketConnected) {
         socket.emit('updateLocation', { tripId: trip._id, location });
+        console.log('📡 Simulation location sent to server');
+      } else {
+        console.warn('⚠️ Socket not connected, location not sent');
       }
     }, 2000); // emit every 2 seconds
 
@@ -395,12 +441,23 @@ const LiveTrackingMap = ({ trip, userRole }) => {
             </h3>
             {userRole === 'driver' && trip.status === 'STARTED' && (
               <p className="text-sm text-gray-600 mt-1">
-                {isTracking ? (
+                {!socketConnected ? (
+                  <span className="text-red-600">⚠ Connecting to server...</span>
+                ) : isTracking ? (
                   <span className="text-green-600">✓ Location tracking active</span>
                 ) : isSimulating ? (
                   <span className="text-blue-600">🔄 Simulating movement</span>
                 ) : (
                   <span className="text-amber-600">⚠ Starting location tracking...</span>
+                )}
+              </p>
+            )}
+            {userRole === 'passenger' && (
+              <p className="text-sm text-gray-600 mt-1">
+                {socketConnected ? (
+                  <span className="text-green-600">✓ Connected</span>
+                ) : (
+                  <span className="text-amber-600">⚠ Connecting...</span>
                 )}
               </p>
             )}
