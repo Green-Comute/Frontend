@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Gift, Award, ArrowLeft, Package, Clock, ShieldAlert } from 'lucide-react';
+import { Gift, Award, Clock, ArrowLeft, Package, ShieldAlert } from 'lucide-react';
 import { gamificationService } from '../../services/gamificationService';
 
 /**
