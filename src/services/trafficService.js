@@ -231,11 +231,12 @@ const parseIncident = (incident) => {
  */
 const formatDelay = (seconds) => {
   if (!seconds || seconds <= 0) return 'No delay';
-  const minutes = Math.round(seconds / 60);
+  const minutes = seconds / 60;
   if (minutes < 1) return '<1 min delay';
-  if (minutes < 60) return `${minutes} min delay`;
-  const hours = Math.floor(minutes / 60);
-  const remainMins = minutes % 60;
+  const roundedMinutes = Math.round(minutes);
+  if (roundedMinutes < 60) return `${roundedMinutes} min delay`;
+  const hours = Math.floor(roundedMinutes / 60);
+  const remainMins = roundedMinutes % 60;
   return `${hours}h ${remainMins}m delay`;
 };
 
