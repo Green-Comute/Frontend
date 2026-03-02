@@ -12,6 +12,7 @@ import PropTypes from 'prop-types';
 import MapView from './MapView';
 import { io } from 'socket.io-client';
 import calculateETA from '../services/etaService';
+import { isTrafficApiConfigured } from '../services/trafficService';
 
 // ─── ETA display helper ──────────────────────────────────────────────────────
 const ETACard = ({ eta, lastUpdated, userRole }) => {
@@ -117,6 +118,11 @@ const LiveTrackingMap = ({ trip, userRole }) => {
   const [isSimulating, setIsSimulating] = useState(false);
   const [error, setError] = useState('');
   const [simulationInterval, setSimulationInterval] = useState(null);
+
+  // ── Traffic overlay state ──
+  const [showTraffic, setShowTraffic] = useState(false);
+  const [showIncidents, setShowIncidents] = useState(false);
+  const trafficApiAvailable = isTrafficApiConfigured();
 
   // ── ETA state ──
   const [eta, setEta] = useState(null);
@@ -411,6 +417,31 @@ const LiveTrackingMap = ({ trip, userRole }) => {
                 {isSimulating ? '⏹ Stop Test' : '🧪 Test Location'}
               </button>
             )}
+            {/* Traffic toggle buttons (visible when API key is configured) */}
+            {trafficApiAvailable && (
+              <>
+                <button
+                  onClick={() => setShowTraffic((prev) => !prev)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${showTraffic
+                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                    : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                    }`}
+                  title="Toggle live traffic flow overlay (green/yellow/red)"
+                >
+                  {showTraffic ? '🟢 Traffic On' : '🚦 Traffic'}
+                </button>
+                <button
+                  onClick={() => setShowIncidents((prev) => !prev)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${showIncidents
+                    ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                    : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                    }`}
+                  title="Toggle traffic incidents (accidents, jams, closures)"
+                >
+                  {showIncidents ? '🚨 Incidents On' : '🚧 Incidents'}
+                </button>
+              </>
+            )}
             <span className={`px-3 py-1 rounded-full text-sm font-semibold ${trip.status === 'STARTED'
               ? 'bg-blue-100 text-blue-700'
               : trip.status === 'COMPLETED'
@@ -463,6 +494,8 @@ const LiveTrackingMap = ({ trip, userRole }) => {
           destinationLocation={trip.destinationLocation}
           waypoints={passengerWaypoints}
           driverLocation={driverLocation}
+          showTraffic={showTraffic}
+          showIncidents={showIncidents}
           height="500px"
         />
 
@@ -486,6 +519,18 @@ const LiveTrackingMap = ({ trip, userRole }) => {
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
               <span className="text-gray-700">Driver (Live)</span>
+            </div>
+          )}
+          {showTraffic && (
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 rounded-full" style={{ background: 'linear-gradient(90deg, #22c55e, #eab308, #ef4444)' }}></div>
+              <span className="text-gray-700">Traffic Flow</span>
+            </div>
+          )}
+          {showIncidents && (
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+              <span className="text-gray-700">Incidents</span>
             </div>
           )}
         </div>

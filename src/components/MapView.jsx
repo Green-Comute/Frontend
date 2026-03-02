@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import PropTypes from 'prop-types';
+import TrafficOverlay from './TrafficOverlay';
 
 // Fix for default marker icons in React-Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -139,18 +140,20 @@ RouteLayer.propTypes = {
   waypoints: PropTypes.array,
 };
 
-const MapView = ({ 
-  sourceLocation, 
-  destinationLocation, 
-  waypoints = [], 
+const MapView = ({
+  sourceLocation,
+  destinationLocation,
+  waypoints = [],
   driverLocation = null,
-  height = '400px', 
-  className = '' 
+  showTraffic = false,
+  showIncidents = false,
+  height = '400px',
+  className = ''
 }) => {
   // Validate location has valid coordinates
   const isValidLocation = (loc) => {
-    return loc && typeof loc.lat === 'number' && typeof loc.lng === 'number' && 
-           !isNaN(loc.lat) && !isNaN(loc.lng);
+    return loc && typeof loc.lat === 'number' && typeof loc.lng === 'number' &&
+      !isNaN(loc.lat) && !isNaN(loc.lng);
   };
 
   const validSource = isValidLocation(sourceLocation) ? sourceLocation : null;
@@ -266,10 +269,16 @@ const MapView = ({
           />
         )}
 
+        {/* Traffic Flow & Incidents Overlay */}
+        <TrafficOverlay
+          showTraffic={showTraffic}
+          showIncidents={showIncidents}
+        />
+
         {/* Auto-adjust bounds */}
-        <MapBounds 
-          sourceLocation={validSource} 
-          destinationLocation={validDestination} 
+        <MapBounds
+          sourceLocation={validSource}
+          destinationLocation={validDestination}
         />
       </MapContainer>
     </div>
@@ -299,6 +308,8 @@ MapView.propTypes = {
     lat: PropTypes.number.isRequired,
     lng: PropTypes.number.isRequired
   }),
+  showTraffic: PropTypes.bool,
+  showIncidents: PropTypes.bool,
   height: PropTypes.string,
   className: PropTypes.string,
 };
