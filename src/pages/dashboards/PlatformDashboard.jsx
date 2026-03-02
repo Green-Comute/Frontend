@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { Building2, UserPlus, Shield, Globe } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Building2, UserPlus, Shield, Globe, Car } from "lucide-react";
 import { registerPasskey } from "../../services/passkeyService";
 
 const PlatformDashboard = () => {
+  const navigate = useNavigate();
   const [orgData, setOrgData] = useState({
     name: "",
     orgCode: "",
@@ -88,11 +90,19 @@ const PlatformDashboard = () => {
   return (
     <div className="min-h-screen bg-stone-50 p-8 space-y-10">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <Shield className="w-8 h-8 text-emerald-600" />
-        <h1 className="text-3xl font-bold text-stone-900">
-          Platform Admin Dashboard
-        </h1>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Shield className="w-8 h-8 text-emerald-600" />
+          <h1 className="text-3xl font-bold text-stone-900">
+            Platform Admin Dashboard
+          </h1>
+        </div>
+        <button
+          onClick={() => navigate('/admin/trips')}
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium shadow-sm"
+        >
+          <Car className="w-4 h-4" /> View All Platform Rides
+        </button>
       </div>
 
       {/* Create Organization */}
@@ -183,8 +193,8 @@ const PlatformDashboard = () => {
                     <td className="p-3">
                       <span
                         className={`text-xs px-2 py-1 rounded ${org.isActive
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
                           }`}
                       >
                         {org.isActive ? "Active" : "Inactive"}
