@@ -233,4 +233,37 @@ export const tripService = {
       method: 'GET',
     });
   },
+
+  /**
+   * Get Trip Summary
+   * 
+   * @description Retrieves comprehensive trip summary with statistics and metrics.
+   * Available to trip driver and approved passengers. Shows timing, passenger details,
+   * distance, cost, and complete journey information.
+   * 
+   * @async
+   * @param {string} tripId - Trip MongoDB ObjectId
+   * @returns {Promise<Object>} Trip summary data
+   * @returns {Object} result.summary - Complete trip summary
+   * @returns {Object} result.summary.route - Route details (source, destination, distance)
+   * @returns {Object} result.summary.timing - Time metrics (scheduled, actual, duration, delay)
+   * @returns {Object} result.summary.passengers - Passenger statistics and list
+   * @returns {Object} result.summary.driver - Driver information
+   * @returns {Object} result.summary.vehicle - Vehicle details
+   * @returns {Object} result.summary.cost - Cost information
+   * 
+   * @throws {Error} 403 - If user is not authorized to view summary
+   * @throws {Error} 404 - If trip not found
+   * 
+   * @example
+   * const { summary } = await tripService.getTripSummary(tripId);
+   * console.log(`Duration: ${summary.timing.durationFormatted}`);
+   * console.log(`Distance: ${summary.route.estimatedDistance}`);
+   * console.log(`Passengers: ${summary.passengers.total}`);
+   */
+  async getTripSummary(tripId) {
+    return await apiRequest(`/trips/${tripId}/summary`, {
+      method: 'GET',
+    });
+  },
 };
