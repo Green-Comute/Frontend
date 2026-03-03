@@ -180,15 +180,90 @@ const LiveTrackingMap = ({ trip, userRole }) => {
     }
   }, [trip.status]);
 
-  // Get passenger waypoints from approved ride requests
-  const passengerWaypoints = (trip.rideRequests || [])
-    .filter(req => req.status === 'APPROVED' && req.passengerId?.pickupLocation)
-    .map(req => ({
-      lat: req.passengerId.pickupLocation.lat,
-      lng: req.passengerId.pickupLocation.lng,
-      name: req.passengerId.name || 'Passenger',
-      address: req.passengerId.pickupLocation.address
-    }));
+  // Get passenger waypoints: prioritize optimized waypoints from trip, fallback to rides
+  const passengerWaypoints = (() => {
+    console.log('🔍 DEBUG - trip.waypoints:', trip.waypoints);
+    console.log('🔍 DEBUG - trip.rides:', trip.rides);
+    console.log('🔍 DEBUG - trip.isOptimized:', trip.isOptimized);
+    
+    // If trip has optimized waypoints, use them
+    if (trip.waypoints && trip.waypoints.length > 0) {
+      console.log('✅ Using trip.waypoints for passenger markers');
+      return trip.waypoints.map((wp, index) => {
+        // Handle both formats: nested coordinates.coordinates OR flat lat/lng
+        let lat, lng;
+        if (wp.coordinates?.coordinates && Array.isArray(wp.coordinates.coordinates)) {
+          // GeoJSON format from backend: coordinates.coordinates = [lng, lat]
+          lng = wp.coordinates.coordinates[0];
+          lat = wp.coordinates.coordinates[1];
+        } else if (wp.lat && wp.lng) {
+          // Flat format (mock data or old format)
+          lat = wp.lat;
+          lng = wp.lng;
+        } else if (wp.coordinates && Array.isArray(wp.coordinates)) {
+          // Direct array [lng, lat]
+          lng = wp.coordinates[0];
+          lat = wp.coordinates[1];
+        }
+        
+        console.log(`  Waypoint ${index + 1}: lat=${lat}, lng=${lng}, name=${wp.passengerName || wp.name}`);
+        
+        return {
+          lat,
+          lng,
+          name: wp.passengerName || wp.name || `Stop ${index + 1}`,
+          address: wp.address,
+          order: wp.order || index + 1
+        };
+      }).filter(wp => wp.lat && wp.lng);
+    }
+    
+    // Fallback: extract from approved rides
+    console.log('⚠️ Fallback to trip.rides for passenger markers');
+    if (trip.rides && trip.rides.length > 0) {
+      console.log('🔍 DEBUG - First ride object:', trip.rides[0]);
+      console.log('🔍 DEBUG - First ride pickupLocation:', trip.rides[0]?.pickupLocation);
+    }
+    
+    return (trip.rides || [])
+      .filter(ride => {
+        const hasStatus = ride.status === 'APPROVED';
+        const hasPickup = ride.pickupLocation?.coordinates;
+        console.log(`  Ride ${ride._id}: status=${ride.status}, hasPickup=${!!hasPickup}`);
+        return hasStatus && hasPickup;
+      })
+      .map(ride => {
+        const coords = ride.pickupLocation.coordinates;
+        console.log(`  Extracting coords from ride:`, coords);
+        
+        let lat, lng;
+        // Handle nested coordinates.coordinates structure
+        if (coords.coordinates && Array.isArray(coords.coordinates)) {
+          lng = coords.coordinates[0];
+          lat = coords.coordinates[1];
+        } else if (Array.isArray(coords)) {
+          // Direct array [lng, lat]
+          lng = coords[0];
+          lat = coords[1];
+        }
+        
+        console.log(`  Extracted: lat=${lat}, lng=${lng}`);
+        
+        return {
+          lat,
+          lng,
+          name: ride.passengerId?.name || 'Passenger',
+          address: ride.pickupLocation.address
+        };
+      })
+      .filter(wp => {
+        const isValid = wp.lat && wp.lng;
+        if (!isValid) console.log(`  ❌ Invalid waypoint filtered out:`, wp);
+        return isValid;
+      });
+  })();
+  
+  console.log('🗺️ Final passengerWaypoints:', passengerWaypoints);
 
   // ── Socket connection ──
   useEffect(() => {
@@ -257,9 +332,15 @@ const LiveTrackingMap = ({ trip, userRole }) => {
     };
   }, [trip._id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Driver: watch real GPS position ──
+  // ── Driver: watch real GPS position (disabled during simulation) ──
   useEffect(() => {
     if (userRole !== 'driver' || !socket || !socketConnected || trip.status !== 'STARTED') {
+      return;
+    }
+
+    // Skip real GPS tracking if simulation is active
+    if (isSimulating) {
+      console.log('⏸️ Skipping real GPS - simulation is active');
       return;
     }
 
@@ -318,7 +399,25 @@ const LiveTrackingMap = ({ trip, userRole }) => {
         console.log('🛑 Stopped GPS tracking');
       }
     };
-  }, [socket, socketConnected, trip._id, trip.status, userRole]);
+  }, [socket, socketConnected, trip._id, trip.status, userRole, isSimulating]);
+
+  // ── Auto-start simulation for testing ──
+  useEffect(() => {
+    // Only auto-start if: driver role, trip started, not already simulating, connected, and simulation interval doesn't exist
+    if (userRole === 'driver' && trip.status === 'STARTED' && !isSimulating && simulationInterval === null && socketConnected) {
+      // Auto-start simulation after a short delay (only runs once)
+      console.log('🧪 Conditions met for auto-start simulation');
+      const timer = setTimeout(() => {
+        console.log('🧪 Auto-starting simulation for testing...');
+        startSimulation();
+      }, 2000);
+      return () => {
+        console.log('🧪 Clearing auto-start timer');
+        clearTimeout(timer);
+      };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trip.status, userRole, socketConnected]); // Removed isSimulating and simulationInterval from deps to prevent re-trigger
 
   // ── Driver: simulate movement along the ACTUAL road route ──
   const startSimulation = async () => {
@@ -343,18 +442,44 @@ const LiveTrackingMap = ({ trip, userRole }) => {
     }
 
     setIsSimulating(true);
+    setIsTracking(true); // Show as "tracking" during simulation
     setError('');
 
-    // ── Step 1: fetch the OSRM road geometry ─────────────────────────────────
+    // ── Step 1: fetch the OSRM road geometry including waypoints ──
     // This is the same API the RouteLayer in MapView uses, so the marker will
     // follow exactly the blue line already drawn on the map.
     let routePoints = [];   // array of {lat, lng}
 
+    // Extract waypoints from trip for multi-stop routing
+    // Handle both nested coordinates.coordinates and flat lat/lng formats
+    const waypoints = (trip.waypoints || [])
+      .map(wp => {
+        let lat, lng;
+        if (wp.coordinates?.coordinates && Array.isArray(wp.coordinates.coordinates)) {
+          // GeoJSON format: coordinates.coordinates = [lng, lat]
+          lng = wp.coordinates.coordinates[0];
+          lat = wp.coordinates.coordinates[1];
+        } else if (wp.lat && wp.lng) {
+          // Flat format
+          lat = wp.lat;
+          lng = wp.lng;
+        } else if (wp.coordinates && Array.isArray(wp.coordinates)) {
+          // Direct array [lng, lat]
+          lng = wp.coordinates[0];
+          lat = wp.coordinates[1];
+        }
+        return lat && lng ? `${lng},${lat}` : null;
+      })
+      .filter(Boolean)
+      .join(';');
+    const waypointCoords = waypoints ? `;${waypoints}` : '';
+
     try {
-      const coords = `${srcLng},${srcLat};${dstLng},${dstLat}`;
+      const coords = `${srcLng},${srcLat}${waypointCoords};${dstLng},${dstLat}`;
+      console.log('🗺️ Fetching route with waypoints:', coords);
       const res = await fetch(
         `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`,
-        { signal: AbortSignal.timeout(6000) }
+        { signal: AbortSignal.timeout(8000) }
       );
       if (res.ok) {
         const data = await res.json();
@@ -380,6 +505,11 @@ const LiveTrackingMap = ({ trip, userRole }) => {
         });
       }
     }
+
+    // Set initial driver location at start point
+    const startLocation = { lat: srcLat, lng: srcLng };
+    setDriverLocation(startLocation);
+    console.log('🎬 Simulation starting at:', startLocation);
 
     // ── Step 2: thin the points so we emit ~1 update every 2 seconds ─────────
     // OSRM can return hundreds of points; keep at most 40 evenly spaced ones
@@ -432,6 +562,23 @@ const LiveTrackingMap = ({ trip, userRole }) => {
 
   return (
     <div className="space-y-4">
+      {/* Testing Mode Banner */}
+      {userRole === 'driver' && trip.status === 'STARTED' && (
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-l-4 border-blue-500 rounded-lg p-4">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <span className="text-2xl">🧪</span>
+            </div>
+            <div className="ml-3">
+              <h4 className="text-sm font-semibold text-blue-900">Testing/Demo Mode Active</h4>
+              <p className="text-xs text-blue-700 mt-1">
+                Location updates are simulated following the actual route. The yellow marker will move along the route automatically, sending socket updates just like real GPS tracking.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Status Bar */}
       <div className="bg-white rounded-lg shadow-md p-4">
         <div className="flex items-center justify-between">
@@ -443,12 +590,12 @@ const LiveTrackingMap = ({ trip, userRole }) => {
               <p className="text-sm text-gray-600 mt-1">
                 {!socketConnected ? (
                   <span className="text-red-600">⚠ Connecting to server...</span>
+                ) : isSimulating ? (
+                  <span className="text-blue-600">🔄 Simulating route movement (Testing Mode)</span>
                 ) : isTracking ? (
                   <span className="text-green-600">✓ Location tracking active</span>
-                ) : isSimulating ? (
-                  <span className="text-blue-600">🔄 Simulating movement</span>
                 ) : (
-                  <span className="text-amber-600">⚠ Starting location tracking...</span>
+                  <span className="text-amber-600">⚠ Starting simulation...</span>
                 )}
               </p>
             )}
@@ -471,7 +618,7 @@ const LiveTrackingMap = ({ trip, userRole }) => {
                   : 'bg-purple-600 hover:bg-purple-700 text-white'
                   }`}
               >
-                {isSimulating ? '⏹ Stop Test' : '🧪 Test Location'}
+                {isSimulating ? '⏹ Stop Simulation' : '▶️ Restart Simulation'}
               </button>
             )}
             {/* Traffic toggle buttons (visible when API key is configured) */}
@@ -601,10 +748,12 @@ LiveTrackingMap.propTypes = {
     _id: PropTypes.string.isRequired,
     sourceLocation: PropTypes.object,
     destinationLocation: PropTypes.object,
-    rideRequests: PropTypes.array,
+    rides: PropTypes.array,
+    waypoints: PropTypes.array,
     status: PropTypes.string
   }).isRequired,
-  userRole: PropTypes.string.isRequired
+  userRole: PropTypes.string.isRequired,
+  optimizedWaypoints: PropTypes.array
 };
 
 export default LiveTrackingMap;

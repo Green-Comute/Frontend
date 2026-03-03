@@ -18,10 +18,14 @@ export const rideService = {
    * Request Ride
    * 
    * @description Passenger requests to join a trip offered by a driver.
-   * Creates a new ride request with PENDING status.
+   * Creates a new ride request with PENDING status. Includes pickup location for route optimization.
    * 
    * @async
    * @param {string} tripId - ID of the trip to request
+   * @param {Object} pickupLocation - Passenger's pickup location
+   * @param {string} pickupLocation.address - Pickup address text
+   * @param {Array<number>} pickupLocation.coordinates - [longitude, latitude]
+   * @param {Object} [dropoffLocation] - Optional dropoff location (defaults to trip destination)
    * 
    * @returns {Promise<Object>} Created ride request data
    * @returns {string} result._id - Ride request ID
@@ -30,13 +34,25 @@ export const rideService = {
    * @throws {Error} If request fails or trip not found
    * 
    * @example
-   * const ride = await rideService.requestRide('64abc123def456789');
+   * const ride = await rideService.requestRide('64abc123def456789', {
+   *   address: '123 Main St',
+   *   coordinates: [-74.0060, 40.7128]
+   * });
    * console.log('Ride request created:', ride._id);
    */
-  async requestRide(tripId) {
+  async requestRide(tripId, pickupLocation, dropoffLocation = null) {
+    const body = { 
+      tripId, 
+      pickupLocation
+    };
+    
+    if (dropoffLocation) {
+      body.dropoffLocation = dropoffLocation;
+    }
+    
     return await apiRequest('/rides/request', {
       method: 'POST',
-      body: JSON.stringify({ tripId }),
+      body: JSON.stringify(body),
     });
   },
 
@@ -234,6 +250,30 @@ export const rideService = {
   async cancelRide(rideId) {
     return await apiRequest(`/rides/${rideId}/cancel`, {
       method: 'POST',
+    });
+  },
+
+  /**
+   * Get Optimized Route Preview
+   *
+   * @description Driver retrieves optimized route with all passenger pickup locations
+   * before starting the trip. Shows the optimal pickup sequence.
+   *
+   * @async
+   * @param {string} tripId - Trip ID to get route preview for
+   *
+   * @returns {Promise<Object>} Optimized route data
+   * @returns {Array<Object>} result.route.waypoints - Ordered pickup locations
+   * @returns {number} result.route.totalDistance - Total distance in km
+   * @returns {number} result.route.estimatedDuration - Duration in minutes
+   *
+   * @example
+   * const preview = await rideService.getOptimizedRoutePreview('64abc123def456789');
+   * console.log('Optimize route:', preview.route.waypoints);
+   */
+  async getOptimizedRoutePreview(tripId) {
+    return await apiRequest(`/trips/${tripId}/route-preview`, {
+      method: 'GET',
     });
   },
 };

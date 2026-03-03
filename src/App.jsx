@@ -19,6 +19,7 @@ import DriverUpload from "./pages/DriverUpload";
 import CreateTrip from './pages/driver/CreateTrip';
 import RideRequests from './pages/driver/RideRequests';
 import ActiveTrip from './pages/driver/ActiveTrip';
+import TestMockTrip from './pages/driver/TestMockTrip';
 
 // Epic-2 Passenger Pages
 import SearchTrips from './pages/passenger/SearchTrips';
@@ -97,6 +98,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ActiveTrip />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/driver/test-mock" 
+            element={
+              <ProtectedRoute>
+                <TestMockTrip />
               </ProtectedRoute>
             } 
           />

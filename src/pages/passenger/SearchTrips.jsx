@@ -138,7 +138,29 @@ const SearchTrips = () => {
       setError('');
       setSuccessMessage('');
 
-      await rideService.requestRide(tripId);
+      // Validate pickup location - check for lat/lng properties
+      if (!sourceLocation || !sourceLocation.lat || !sourceLocation.lng) {
+        setError('Please select a valid pickup location from the dropdown suggestions');
+        return;
+      }
+
+      // Prepare pickup location data - backend expects [longitude, latitude] format
+      const pickupLocation = {
+        address: sourceLocation.address || searchParams.source,
+        coordinates: [sourceLocation.lng, sourceLocation.lat] // [longitude, latitude]
+      };
+
+      console.log('🔍 FRONTEND: sourceLocation:', sourceLocation);
+      console.log('🔍 FRONTEND: pickupLocation being sent:', pickupLocation);
+      console.log('🔍 FRONTEND: coordinates array:', pickupLocation.coordinates);
+
+      // Optionally include dropoff location if different from trip destination
+      const dropoffLocation = destinationLocation?.lat && destinationLocation?.lng ? {
+        address: destinationLocation.address || searchParams.destination,
+        coordinates: [destinationLocation.lng, destinationLocation.lat] // [longitude, latitude]
+      } : null;
+
+      await rideService.requestRide(tripId, pickupLocation, dropoffLocation);
 
       setSuccessMessage('Ride requested successfully! The driver will review your request.');
       setRequestedTripIds([...requestedTripIds, tripId]);
