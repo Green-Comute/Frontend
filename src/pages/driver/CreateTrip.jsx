@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { tripService } from '../../services/tripService';
 import LocationAutocomplete from '../../components/LocationAutocomplete';
 import MapView from '../../components/MapView';
+import FuelTypeSelect from '../../components/FuelTypeSelect';
 
 const CreateTrip = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const CreateTrip = () => {
     scheduledTime: '',
     vehicleType: 'CAR',
     totalSeats: 4,
+    fuelType: '',
   });
 
   const [sourceLocation, setSourceLocation] = useState(null);
@@ -82,6 +84,12 @@ const CreateTrip = () => {
         return;
       }
 
+      if (!formData.fuelType) {
+        setError('Please select a fuel type');
+        setLoading(false);
+        return;
+      }
+
       const scheduledDateTime = `${formData.scheduledDate}T${formData.scheduledTime}`;
 
       // Validate seats for CAR
@@ -97,6 +105,7 @@ const CreateTrip = () => {
         destination: formData.destination,
         scheduledTime: scheduledDateTime,
         vehicleType: formData.vehicleType,
+        fuelType: formData.fuelType,
         totalSeats: parseInt(formData.totalSeats),
         sourceLocation: sourceLocation?.lat && sourceLocation?.lng ? {
           address: sourceLocation.address,
@@ -120,6 +129,7 @@ const CreateTrip = () => {
         scheduledTime: '',
         vehicleType: 'CAR',
         totalSeats: 4,
+        fuelType: '',
       });
       setSourceLocation(null);
       setDestinationLocation(null);
@@ -287,9 +297,15 @@ const CreateTrip = () => {
               </p>
             </div>
 
+            <FuelTypeSelect
+              value={formData.fuelType}
+              onChange={handleChange}
+              required
+            />
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !formData.fuelType}
               className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {loading ? 'Creating Trip...' : 'Create Trip'}
