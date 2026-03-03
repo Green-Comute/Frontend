@@ -32,14 +32,29 @@ const destinationIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-const passengerIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [20, 33],
-  iconAnchor: [10, 33],
-  popupAnchor: [1, -28],
-  shadowSize: [33, 33]
-});
+// Function to create numbered passenger markers for optimized route
+const createNumberedIcon = (number) => {
+  return L.divIcon({
+    className: 'custom-div-icon',
+    html: `<div style="
+      background-color: #3b82f6;
+      color: white;
+      border: 3px solid white;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    ">${number}</div>`,
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
+    popupAnchor: [0, -18]
+  });
+};
 
 const driverIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
@@ -234,14 +249,14 @@ const MapView = ({
           <Marker
             key={`waypoint-${index}`}
             position={[waypoint.lat, waypoint.lng]}
-            icon={passengerIcon}
+            icon={createNumberedIcon(index + 1)}
           >
             <Popup>
               <div className="font-semibold text-blue-700">
-                Passenger Pickup {index + 1}
+                Stop #{index + 1}: {waypoint.name || 'Passenger'}
               </div>
               <div className="text-sm text-gray-600">
-                {waypoint.name || waypoint.address}
+                {waypoint.address}
               </div>
             </Popup>
           </Marker>
