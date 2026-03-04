@@ -61,7 +61,7 @@ const RideRequests = () => {
       setLoading(true);
       const data = await tripService.getDriverTrips();
       setTrips(data.trips || []);
-      
+
       // Auto-select first trip if available
       if (data.trips && data.trips.length > 0) {
         setSelectedTrip(data.trips[0]);
@@ -86,17 +86,17 @@ const RideRequests = () => {
     try {
       setError('');
       setSuccessMessage('');
-      
+
       await rideService.decideRideRequest(rideId, decision);
-      
+
       setSuccessMessage(`Ride request ${decision.toLowerCase()} successfully!`);
-      
+
       // Refresh ride requests and trips
       if (selectedTrip) {
         await fetchRideRequests(selectedTrip._id);
         await fetchDriverTrips();
       }
-      
+
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
@@ -111,13 +111,13 @@ const RideRequests = () => {
     try {
       setError('');
       setSuccessMessage('');
-      
+
       await tripService.startTrip(tripId);
       setSuccessMessage('Trip started successfully!');
-      
+
       // Refresh trips
       await fetchDriverTrips();
-      
+
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       setError(err.message || 'Failed to start trip');
@@ -129,28 +129,17 @@ const RideRequests = () => {
     try {
       setError('');
       setSuccessMessage('');
-      
+
       await tripService.endTrip(tripId);
       setSuccessMessage('Trip ended successfully!');
-      
+
       // Refresh trips
       await fetchDriverTrips();
-      
+
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       setError(err.message || 'Failed to end trip');
     }
-  };
-
-  // Helper functions to determine if trip status actions are available
-  // eslint-disable-next-line no-unused-vars
-  const canStartTrip = (trip) => {
-    return trip.status === 'SCHEDULED';
-  };
-
-  // eslint-disable-next-line no-unused-vars
-  const canEndTrip = (trip) => {
-    return trip.status === 'IN_PROGRESS';
   };
 
   if (loading) {
@@ -227,24 +216,22 @@ const RideRequests = () => {
                     <div
                       key={trip._id}
                       onClick={() => setSelectedTrip(trip)}
-                      className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                        selectedTrip?._id === trip._id
+                      className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedTrip?._id === trip._id
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-200 hover:border-gray-300'
-                      }`}
+                        }`}
                     >
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="font-medium text-gray-900">
                           {trip.source} → {trip.destination}
                         </h3>
                         <span
-                          className={`px-2 py-1 rounded text-xs font-medium ${
-                            trip.status === 'SCHEDULED'
+                          className={`px-2 py-1 rounded text-xs font-medium ${trip.status === 'SCHEDULED'
                               ? 'bg-blue-100 text-blue-800'
                               : trip.status === 'IN_PROGRESS'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-gray-100 text-gray-800'
+                            }`}
                         >
                           {trip.status}
                         </span>
