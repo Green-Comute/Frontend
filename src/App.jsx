@@ -24,6 +24,11 @@ import ActiveTrip from './pages/driver/ActiveTrip';
 import SearchTrips from './pages/passenger/SearchTrips';
 import PassengerTripTracking from './pages/passenger/PassengerTripTracking';
 
+// Epic-3 ESG / Impact Pages
+import MyImpact from './pages/impact/MyImpact';
+import OrgEsgDashboard from './pages/esg/OrgEsgDashboard';
+import PlatformEsgDashboard from './pages/esg/PlatformEsgDashboard';
+
 function App() {
   return (
     <Router>
@@ -101,6 +106,32 @@ function App() {
             } 
           />
           
+          {/* Epic-3 Impact / ESG Routes */}
+          <Route
+            path="/impact/my"
+            element={
+              <ProtectedRoute>
+                <MyImpact />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/org-admin/esg"
+            element={
+              <ProtectedRoute role="ORG_ADMIN">
+                <OrgEsgDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/platform/esg"
+            element={
+              <ProtectedRoute role="PLATFORM_ADMIN">
+                <PlatformEsgDashboard />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Epic-2 Passenger Routes */}
           <Route 
             path="/passenger/search" 

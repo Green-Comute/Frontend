@@ -152,14 +152,22 @@ const OrgAdminDashboard = () => {
           </h1>
         </div>
 
-        {/* Driver Requests CTA */}
-        <button
-          onClick={() => navigate("/admin/driver-requests")}
-          className="flex items-center gap-2 px-4 py-2 bg-stone-800 text-white rounded-lg hover:bg-stone-900 transition"
-        >
-          <Car className="w-4 h-4" />
-          Driver Requests
-        </button>
+        {/* Header Actions */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate("/org-admin/esg")}
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
+          >
+            🌿 ESG Dashboard
+          </button>
+          <button
+            onClick={() => navigate("/admin/driver-requests")}
+            className="flex items-center gap-2 px-4 py-2 bg-stone-800 text-white rounded-lg hover:bg-stone-900 transition"
+          >
+            <Car className="w-4 h-4" />
+            Driver Requests
+          </button>
+        </div>
       </div>
 
       {/* Pending Count */}

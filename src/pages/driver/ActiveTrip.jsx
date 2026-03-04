@@ -40,10 +40,21 @@ const ActiveTrip = () => {
 
   const user = getUserData();
 
+  const fetchTripDetails = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await tripService.getTripById(tripId);
+      setTrip(data.trip);
+    } catch (err) {
+      setError(err.message || 'Failed to load trip details');
+    } finally {
+      setLoading(false);
+    }
+  }, [tripId]);
+
   useEffect(() => {
     fetchTripDetails();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tripId]);
+  }, [fetchTripDetails]);
 
   // Socket connection: listen for passenger cancellations
   useEffect(() => {
@@ -60,18 +71,6 @@ const ActiveTrip = () => {
 
     return () => socket.disconnect();
   }, [fetchTripDetails]);
-
-  const fetchTripDetails = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await tripService.getTripById(tripId);
-      setTrip(data.trip);
-    } catch (err) {
-      setError(err.message || 'Failed to load trip details');
-    } finally {
-      setLoading(false);
-    }
-  }, [tripId]);
 
   const handleStartTrip = async () => {
     try {

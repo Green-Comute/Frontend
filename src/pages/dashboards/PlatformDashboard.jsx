@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Building2, UserPlus, Shield, Globe } from "lucide-react";
 import { registerPasskey } from "../../services/passkeyService";
 
 const PlatformDashboard = () => {
+  const navigate = useNavigate();
   const [orgData, setOrgData] = useState({
     name: "",
     orgCode: "",
@@ -88,11 +90,20 @@ const PlatformDashboard = () => {
   return (
     <div className="min-h-screen bg-stone-50 p-8 space-y-10">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <Shield className="w-8 h-8 text-emerald-600" />
-        <h1 className="text-3xl font-bold text-stone-900">
-          Platform Admin Dashboard
-        </h1>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Shield className="w-8 h-8 text-emerald-600" />
+          <h1 className="text-3xl font-bold text-stone-900">
+            Platform Admin Dashboard
+          </h1>
+        </div>
+        <button
+          onClick={() => navigate("/platform/esg")}
+          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
+        >
+          <Globe className="w-4 h-4" />
+          Global ESG Stats
+        </button>
       </div>
 
       {/* Create Organization */}
