@@ -51,8 +51,7 @@ const PassengerTripTracking = () => {
 
   useEffect(() => {
     fetchRideDetails();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rideId]);
+  }, [rideId, fetchRideDetails]);
 
   // Setup socket connection for real-time updates
   useEffect(() => {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, CheckCircle, Car, Trash2, UserX } from "lucide-react";
+import { Users, CheckCircle, Car, Trash2, UserX, Gift, Inbox, Shield, Eye } from "lucide-react";
 import { registerPasskey } from "../../services/passkeyService";
 
 const OrgAdminDashboard = () => {
@@ -148,67 +148,97 @@ const OrgAdminDashboard = () => {
         <div className="flex items-center gap-3">
           <Users className="w-8 h-8 text-emerald-600" />
           <h1 className="text-3xl font-bold text-stone-900">
-            Organization Admin
+            Organization Admin Dashboard
           </h1>
         </div>
+        <button
+          onClick={() => navigate('/admin/trips')}
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium shadow-sm border"
+        >
+          <Car className="w-4 h-4" /> View All Org Rides
+        </button>
+      </div>
 
-        {/* Driver Requests CTA */}
+      {/* Admin Navigation Actions */}
+      <div className="flex items-center gap-3">
+        {/* Epic-2 Driver Requests */}
         <button
           onClick={() => navigate("/admin/driver-requests")}
-          className="flex items-center gap-2 px-4 py-2 bg-stone-800 text-white rounded-lg hover:bg-stone-900 transition"
+          className="flex items-center gap-2 px-4 py-2 bg-stone-800 text-white font-medium rounded-lg hover:bg-stone-900 transition shadow-sm"
         >
-          <Car className="w-4 h-4" />
-          Driver Requests
+          <Car className="w-4 h-4" /> Driver Requests
+        </button>
+
+        {/* Epic-4 Gamification & Rewards Admin */}
+        <button
+          onClick={() => navigate("/admin/redemptions")}
+          className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 transition shadow-sm"
+        >
+          <Inbox className="w-4 h-4" /> Redemptions
+        </button>
+        <button
+          onClick={() => navigate("/admin/rewards")}
+          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition shadow-sm"
+        >
+          <Gift className="w-4 h-4" /> Rewards Catalog
+        </button>
+        <button
+          onClick={() => navigate("/admin/tiers")}
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition shadow-sm"
+        >
+          <Shield className="w-4 h-4" /> Tiers
         </button>
       </div>
 
       {/* Pending Count */}
-      <div className="mb-6 text-sm text-stone-600">
-        Pending approvals:{" "}
+      <div className="mt-8 mb-4 text-sm text-stone-600">
+        Pending approvals: {" "}
         <span className="font-semibold text-emerald-700">{users.length}</span>
       </div>
 
       {/* Pending Users */}
-      {users.length === 0 ? (
-        <div className="bg-emerald-50 border border-emerald-200 p-6 rounded-xl flex items-center gap-3">
-          <CheckCircle className="w-6 h-6 text-emerald-600" />
-          <p className="text-emerald-800 font-medium">
-            🎉 No pending users at the moment
-          </p>
-        </div>
-      ) : (
-        <div className="overflow-x-auto bg-white rounded-xl shadow border">
-          <table className="w-full border-collapse">
-            <thead className="bg-stone-100">
-              <tr className="border-b">
-                <th className="text-left p-4">Email</th>
-                <th className="text-left p-4">Phone</th>
-                <th className="text-left p-4">Joined</th>
-                <th className="text-left p-4">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((u) => (
-                <tr key={u._id} className="border-b hover:bg-stone-50">
-                  <td className="p-4">{u.email}</td>
-                  <td className="p-4">{u.phone}</td>
-                  <td className="p-4">
-                    {new Date(u.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="p-4">
-                    <button
-                      onClick={() => approveUser(u._id)}
-                      className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
-                    >
-                      Approve
-                    </button>
-                  </td>
+      {
+        users.length === 0 ? (
+          <div className="bg-emerald-50 border border-emerald-200 p-6 rounded-xl flex items-center gap-3">
+            <CheckCircle className="w-6 h-6 text-emerald-600" />
+            <p className="text-emerald-800 font-medium">
+              🎉 No pending users at the moment
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto bg-white rounded-xl shadow border">
+            <table className="w-full border-collapse">
+              <thead className="bg-stone-100">
+                <tr className="border-b">
+                  <th className="text-left p-4">Email</th>
+                  <th className="text-left p-4">Phone</th>
+                  <th className="text-left p-4">Joined</th>
+                  <th className="text-left p-4">Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody>
+                {users.map((u) => (
+                  <tr key={u._id} className="border-b hover:bg-stone-50">
+                    <td className="p-4">{u.email}</td>
+                    <td className="p-4">{u.phone}</td>
+                    <td className="p-4">
+                      {new Date(u.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="p-4">
+                      <button
+                        onClick={() => approveUser(u._id)}
+                        className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
+                      >
+                        Approve
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+      }
 
       {/* ────── Manage Members ────── */}
       <section className="mt-8">
@@ -250,8 +280,8 @@ const OrgAdminDashboard = () => {
                     <td className="p-4">
                       <span
                         className={`text-xs px-2 py-1 rounded ${m.isDriver
-                            ? "bg-green-100 text-green-700"
-                            : "bg-stone-100 text-stone-500"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-stone-100 text-stone-500"
                           }`}
                       >
                         {m.isDriver ? "Yes" : "No"}
@@ -261,13 +291,22 @@ const OrgAdminDashboard = () => {
                       {new Date(m.createdAt).toLocaleDateString()}
                     </td>
                     <td className="p-4">
-                      <button
-                        onClick={() => removeUser(m._id, m.email)}
-                        className="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 hover:text-red-700 transition text-sm font-medium"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Remove
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => navigate(`/admin/user/${m._id}`)}
+                          className="flex items-center gap-1.5 px-3 py-2 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition text-sm font-medium"
+                        >
+                          <Eye className="w-4 h-4" />
+                          View
+                        </button>
+                        <button
+                          onClick={() => removeUser(m._id, m.email)}
+                          className="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 hover:text-red-700 transition text-sm font-medium"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Remove
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -303,7 +342,7 @@ const OrgAdminDashboard = () => {
           </p>
         )}
       </section>
-    </div>
+    </div >
   );
 };
 

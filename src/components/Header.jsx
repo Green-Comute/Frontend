@@ -69,9 +69,25 @@ const Header = () => {
                 Find Rides
               </button>
 
+              {/* Epic-4 Gamification Links */}
+
+              <button
+                onClick={() => navigate("/rewards")}
+                className="text-stone-700 hover:text-emerald-700 font-medium transition"
+              >
+                Rewards
+              </button>
+
+              <button
+                onClick={() => navigate("/gamification/leaderboard")}
+                className="text-stone-700 hover:text-emerald-700 font-medium transition"
+              >
+                Leaderboard
+              </button>
+
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-1 text-red-600 hover:text-red-700 font-medium transition"
+                className="flex items-center gap-1 text-red-600 hover:text-red-700 font-medium transition ml-4"
               >
                 <LogOut className="w-4 h-4" />
                 Logout
