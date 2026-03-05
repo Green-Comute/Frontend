@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { rideService } from '../../services/rideService';
 import { tripService } from '../../services/tripService';
@@ -22,6 +22,32 @@ const PassengerTripTracking = () => {
 
   // Keep tripRef in sync so socket handler always has fresh trip data
   useEffect(() => { tripRef.current = trip; }, [trip]);
+
+  const fetchRideDetails = useCallback(async () => {
+    try {
+      setLoading(true);
+      // Get passenger's rides and find this one
+      const data = await rideService.getPassengerRides();
+      const currentRide = data.rides.find(r => r._id === rideId);
+
+      if (!currentRide) {
+        setError('Ride not found');
+        return;
+      }
+
+      setRide(currentRide);
+
+      // Fetch full trip details
+      if (currentRide.tripId?._id) {
+        const tripData = await tripService.getTripById(currentRide.tripId._id);
+        setTrip(tripData.trip);
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to load ride details');
+    } finally {
+      setLoading(false);
+    }
+  }, [rideId]);
 
   useEffect(() => {
     fetchRideDetails();
@@ -106,32 +132,6 @@ const PassengerTripTracking = () => {
       }
     };
   }, [ride, rideId]);
-
-  const fetchRideDetails = async () => {
-    try {
-      setLoading(true);
-      // Get passenger's rides and find this one
-      const data = await rideService.getPassengerRides();
-      const currentRide = data.rides.find(r => r._id === rideId);
-
-      if (!currentRide) {
-        setError('Ride not found');
-        return;
-      }
-
-      setRide(currentRide);
-
-      // Fetch full trip details
-      if (currentRide.tripId?._id) {
-        const tripData = await tripService.getTripById(currentRide.tripId._id);
-        setTrip(tripData.trip);
-      }
-    } catch (err) {
-      setError(err.message || 'Failed to load ride details');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleCancelRide = async () => {
     if (!window.confirm('Are you sure you want to cancel your ride? This action cannot be undone.')) {
