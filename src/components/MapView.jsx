@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import PropTypes from 'prop-types';
+import TrafficOverlay from './TrafficOverlay';
 
 // Fix for default marker icons in React-Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -31,14 +32,29 @@ const destinationIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-const passengerIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [20, 33],
-  iconAnchor: [10, 33],
-  popupAnchor: [1, -28],
-  shadowSize: [33, 33]
-});
+// Function to create numbered passenger markers for optimized route
+const createNumberedIcon = (number) => {
+  return L.divIcon({
+    className: 'custom-div-icon',
+    html: `<div style="
+      background-color: #3b82f6;
+      color: white;
+      border: 3px solid white;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    ">${number}</div>`,
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
+    popupAnchor: [0, -18]
+  });
+};
 
 const driverIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
@@ -139,18 +155,20 @@ RouteLayer.propTypes = {
   waypoints: PropTypes.array,
 };
 
-const MapView = ({ 
-  sourceLocation, 
-  destinationLocation, 
-  waypoints = [], 
+const MapView = ({
+  sourceLocation,
+  destinationLocation,
+  waypoints = [],
   driverLocation = null,
-  height = '400px', 
-  className = '' 
+  showTraffic = false,
+  showIncidents = false,
+  height = '400px',
+  className = ''
 }) => {
   // Validate location has valid coordinates
   const isValidLocation = (loc) => {
-    return loc && typeof loc.lat === 'number' && typeof loc.lng === 'number' && 
-           !isNaN(loc.lat) && !isNaN(loc.lng);
+    return loc && typeof loc.lat === 'number' && typeof loc.lng === 'number' &&
+      !isNaN(loc.lat) && !isNaN(loc.lng);
   };
 
   const validSource = isValidLocation(sourceLocation) ? sourceLocation : null;
@@ -231,14 +249,14 @@ const MapView = ({
           <Marker
             key={`waypoint-${index}`}
             position={[waypoint.lat, waypoint.lng]}
-            icon={passengerIcon}
+            icon={createNumberedIcon(index + 1)}
           >
             <Popup>
               <div className="font-semibold text-blue-700">
-                Passenger Pickup {index + 1}
+                Stop #{index + 1}: {waypoint.name || 'Passenger'}
               </div>
               <div className="text-sm text-gray-600">
-                {waypoint.name || waypoint.address}
+                {waypoint.address}
               </div>
             </Popup>
           </Marker>
@@ -266,10 +284,16 @@ const MapView = ({
           />
         )}
 
+        {/* Traffic Flow & Incidents Overlay */}
+        <TrafficOverlay
+          showTraffic={showTraffic}
+          showIncidents={showIncidents}
+        />
+
         {/* Auto-adjust bounds */}
-        <MapBounds 
-          sourceLocation={validSource} 
-          destinationLocation={validDestination} 
+        <MapBounds
+          sourceLocation={validSource}
+          destinationLocation={validDestination}
         />
       </MapContainer>
     </div>
@@ -299,6 +323,8 @@ MapView.propTypes = {
     lat: PropTypes.number.isRequired,
     lng: PropTypes.number.isRequired
   }),
+  showTraffic: PropTypes.bool,
+  showIncidents: PropTypes.bool,
   height: PropTypes.string,
   className: PropTypes.string,
 };

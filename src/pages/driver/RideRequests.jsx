@@ -140,17 +140,17 @@ const RideRequests = () => {
     try {
       setError('');
       setSuccessMessage('');
-      
+
       await rideService.decideRideRequest(rideId, decision);
-      
+
       setSuccessMessage(`Ride request ${decision.toLowerCase()} successfully!`);
-      
+
       // Refresh ride requests and trips in the background
       if (selectedTrip) {
         await fetchRideRequests(selectedTrip._id);
         await fetchDriverTripsBackground();
       }
-      
+
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
@@ -165,13 +165,13 @@ const RideRequests = () => {
     try {
       setError('');
       setSuccessMessage('');
-      
+
       await tripService.startTrip(tripId);
       setSuccessMessage('Trip started successfully!');
-      
+
       // Refresh trips in background
       await fetchDriverTripsBackground();
-      
+
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       setError(err.message || 'Failed to start trip');
@@ -183,28 +183,17 @@ const RideRequests = () => {
     try {
       setError('');
       setSuccessMessage('');
-      
+
       await tripService.endTrip(tripId);
       setSuccessMessage('Trip ended successfully!');
-      
+
       // Refresh trips in background
       await fetchDriverTripsBackground();
-      
+
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       setError(err.message || 'Failed to end trip');
     }
-  };
-
-  // Helper functions to determine if trip status actions are available
-  // eslint-disable-next-line no-unused-vars
-  const canStartTrip = (trip) => {
-    return trip.status === 'SCHEDULED';
-  };
-
-  // eslint-disable-next-line no-unused-vars
-  const canEndTrip = (trip) => {
-    return trip.status === 'IN_PROGRESS';
   };
 
   if (loading) {
@@ -281,13 +270,12 @@ const RideRequests = () => {
                     <div
                       key={trip._id}
                       onClick={() => setSelectedTrip(trip)}
-                      className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                        selectedTrip?._id === trip._id
+                      className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedTrip?._id === trip._id
                           ? 'border-blue-500 bg-blue-50'
                           : (trip.pendingRequestCount || 0) > 0
                           ? 'border-orange-400 bg-orange-50'
                           : 'border-gray-200 hover:border-gray-300'
-                      }`}
+                        }`}
                     >
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="font-medium text-gray-900 flex items-center gap-2">
@@ -299,13 +287,12 @@ const RideRequests = () => {
                           )}
                         </h3>
                         <span
-                          className={`px-2 py-1 rounded text-xs font-medium ${
-                            trip.status === 'SCHEDULED'
+                          className={`px-2 py-1 rounded text-xs font-medium ${trip.status === 'SCHEDULED'
                               ? 'bg-blue-100 text-blue-800'
                               : trip.status === 'IN_PROGRESS'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-gray-100 text-gray-800'
+                            }`}
                         >
                           {trip.status}
                         </span>

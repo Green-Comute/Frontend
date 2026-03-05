@@ -128,16 +128,17 @@ const CreateTrip = () => {
         scheduledDate: '',
         scheduledTime: '',
         vehicleType: 'CAR',
-        totalSeats: 4,
+        totalSeats: '4',
         fuelType: '',
       });
       setSourceLocation(null);
       setDestinationLocation(null);
 
-      // Redirect to driver dashboard after 2 seconds
+      // Redirect to driver requests/trips page after 2 seconds
       setTimeout(() => {
         navigate('/driver/requests');
       }, 2000);
+
     } catch (err) {
       setError(err.message || 'Failed to create trip');
     } finally {
@@ -183,7 +184,7 @@ const CreateTrip = () => {
               required
             />
 
-            {/* Map Preview */}
+            {/* Route Preview */}
             {((sourceLocation?.lat && sourceLocation?.lng) || (destinationLocation?.lat && destinationLocation?.lng)) && (
               <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
                 <h3 className="text-sm font-medium text-gray-700 mb-3">Route Preview</h3>
@@ -193,31 +194,33 @@ const CreateTrip = () => {
                   height="350px"
                 />
                 {sourceLocation && destinationLocation && (
-                  <div className="mt-3 grid grid-cols-1 gap-2 text-sm">
+                  <div className="mt-3 space-y-2 text-sm">
                     <div className="flex items-start space-x-2">
                       <div className="w-3 h-3 bg-green-500 rounded-full mt-1 flex-shrink-0"></div>
                       <div className="flex-1">
-                        <div className="font-medium text-gray-900">Pickup</div>
+                        <div className="font-medium text-gray-900">Start</div>
                         <div className="text-gray-600 text-xs">{sourceLocation.address}</div>
                       </div>
                     </div>
                     <div className="flex items-start space-x-2">
                       <div className="w-3 h-3 bg-red-500 rounded-full mt-1 flex-shrink-0"></div>
                       <div className="flex-1">
-                        <div className="font-medium text-gray-900">Drop-off</div>
+                        <div className="font-medium text-gray-900">End</div>
                         <div className="text-gray-600 text-xs">{destinationLocation.address}</div>
                       </div>
+                    </div>
+                    <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
+                      ℹ️ Passenger pickup locations will be automatically optimized when you approve riders
                     </div>
                   </div>
                 )}
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Scheduled Date
-                </label>
+            {/* Scheduled Date and Time */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label className="block">
+                <span className="text-sm font-medium text-gray-700 block mb-2">Scheduled Date *</span>
                 <input
                   type="date"
                   name="scheduledDate"
@@ -229,11 +232,9 @@ const CreateTrip = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
                 />
                 <p className="text-xs text-gray-500 mt-1">Max 7 days from now</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Scheduled Time
-                </label>
+              </label>
+              <label className="block">
+                <span className="text-sm font-medium text-gray-700 block mb-2">Scheduled Time *</span>
                 <input
                   type="time"
                   name="scheduledTime"
@@ -242,7 +243,7 @@ const CreateTrip = () => {
                   required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
                 />
-              </div>
+              </label>
             </div>
 
             <div>

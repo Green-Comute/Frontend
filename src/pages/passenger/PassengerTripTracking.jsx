@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { rideService } from '../../services/rideService';
 import { tripService } from '../../services/tripService';
@@ -25,8 +25,7 @@ const PassengerTripTracking = () => {
 
   useEffect(() => {
     fetchRideDetails();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rideId]);
+  }, [rideId, fetchRideDetails]);
 
   // Setup socket connection for real-time updates
   useEffect(() => {
@@ -107,7 +106,7 @@ const PassengerTripTracking = () => {
     };
   }, [ride, rideId]);
 
-  const fetchRideDetails = async () => {
+  const fetchRideDetails = useCallback(async () => {
     try {
       setLoading(true);
       // Get passenger's rides and find this one
@@ -131,7 +130,7 @@ const PassengerTripTracking = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [rideId]);;
 
   const handleCancelRide = async () => {
     if (!window.confirm('Are you sure you want to cancel your ride? This action cannot be undone.')) {

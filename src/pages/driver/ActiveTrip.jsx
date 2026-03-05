@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { tripService } from '../../services/tripService';
 import { rideService } from '../../services/rideService';
 import LiveTrackingMap from '../../components/LiveTrackingMap';
+import TripSummary from '../../components/TripSummary';
+import RoutePreview from '../../components/RoutePreview';
 import { io } from 'socket.io-client';
 
 const ActiveTrip = () => {
@@ -14,6 +16,9 @@ const ActiveTrip = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [pickupLoading, setPickupLoading] = useState({});
   const [passengerCancelAlert, setPassengerCancelAlert] = useState(null);
+  const [showSummary, setShowSummary] = useState(false);
+  const [optimizedRoute, setOptimizedRoute] = useState(null);
+  const [routeLoading, setRouteLoading] = useState(false);
 
   // Get user from localStorage - try multiple keys
   const getUserData = () => {
@@ -45,10 +50,29 @@ const ActiveTrip = () => {
       setLoading(true);
       const data = await tripService.getTripById(tripId);
       setTrip(data.trip);
+      
+      // Fetch optimized route if trip is scheduled/started and has approved passengers
+      if ((data.trip.status === 'SCHEDULED' || data.trip.status === 'STARTED' || data.trip.status === 'IN_PROGRESS') && data.trip.isOptimized) {
+        fetchOptimizedRoute();
+      }
     } catch (err) {
       setError(err.message || 'Failed to load trip details');
     } finally {
       setLoading(false);
+    }
+  }, [tripId]);
+
+  const fetchOptimizedRoute = useCallback(async () => {
+    try {
+      setRouteLoading(true);
+      const routeData = await rideService.getOptimizedRoutePreview(tripId);
+      setOptimizedRoute(routeData.route);
+    } catch (err) {
+      // Non-critical error - route optimization may not be available yet
+      console.log('Route preview not available:', err.message);
+      setOptimizedRoute(null);
+    } finally {
+      setRouteLoading(false);
     }
   }, [tripId]);
 
@@ -96,15 +120,18 @@ const ActiveTrip = () => {
       await tripService.completeTrip(tripId);
       await fetchTripDetails(); // Refresh trip data
 
-      // Redirect after 2 seconds
-      setTimeout(() => {
-        navigate('/driver/requests');
-      }, 2000);
+      // Show summary modal instead of redirecting immediately
+      setShowSummary(true);
     } catch (err) {
       setError(err.message || 'Failed to complete trip');
     } finally {
       setActionLoading(false);
     }
+  };
+
+  const handleCloseSummary = () => {
+    setShowSummary(false);
+    navigate('/driver/requests');
   };
 
   const handleCancelTrip = async () => {
@@ -306,6 +333,16 @@ const ActiveTrip = () => {
                     </button>
                   </div>
                 )}
+                {trip.status === 'COMPLETED' && (
+                  <div className="pt-3">
+                    <button
+                      onClick={() => setShowSummary(true)}
+                      className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    >
+                      📊 View Trip Summary
+                    </button>
+                  </div>
+                )}
                 {isDriver && trip.status === 'SCHEDULED' && (
                   <div>
                     <button
@@ -321,6 +358,61 @@ const ActiveTrip = () => {
             </div>
           </div>
         </div>
+
+        {/* Optimized Route Preview - Show before trip starts */}
+        {isDriver && trip.status === 'SCHEDULED' && optimizedRoute && (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-semibold text-gray-900">Optimized Route Preview</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  Review the optimized pickup sequence for your passengers
+                </p>
+              </div>
+              <div className="text-sm bg-green-50 text-green-700 px-3 py-1 rounded-full font-medium">
+                ✓ Route Optimized
+              </div>
+            </div>
+            
+            <RoutePreview 
+              source={{
+                lat: optimizedRoute.source.coordinates?.[1],
+                lng: optimizedRoute.source.coordinates?.[0],
+                address: optimizedRoute.source.address
+              }}
+              destination={{
+                lat: optimizedRoute.destination.coordinates?.[1],
+                lng: optimizedRoute.destination.coordinates?.[0],
+                address: optimizedRoute.destination.address
+              }}
+              waypoints={optimizedRoute.waypoints || []}
+              totalDistance={optimizedRoute.totalDistance}
+              estimatedDuration={optimizedRoute.estimatedDuration}
+              isOptimized={optimizedRoute.isOptimized}
+            />
+            
+            <div className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-gray-600">Total Distance:</span>
+                <p className="font-medium text-gray-900">{optimizedRoute.totalDistance?.toFixed(2)} km</p>
+              </div>
+              <div>
+                <span className="text-gray-600">Estimated Duration:</span>
+                <p className="font-medium text-gray-900">{optimizedRoute.estimatedDuration?.toFixed(0)} minutes</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Show message if no optimized route yet */}
+        {isDriver && trip.status === 'SCHEDULED' && approvedPassengers.length > 0 && !optimizedRoute && !routeLoading && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-sm text-blue-700">
+              ℹ️ Route will be optimized automatically when you approve more passengers. 
+              Start the trip to see passenger pickup locations.
+            </p>
+          </div>
+        )}
 
         {/* Passengers List */}
         {approvedPassengers.length > 0 && (
@@ -405,12 +497,57 @@ const ActiveTrip = () => {
           </div>
         )}
 
+        {/* Route Info - Show during active trip */}
+        {isDriver && (trip.status === 'STARTED' || trip.status === 'IN_PROGRESS') && trip.waypoints && trip.waypoints.length > 0 && (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-semibold text-gray-900">Pickup Sequence</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  Follow the optimized route to pick up passengers
+                </p>
+              </div>
+              <div className="text-sm bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">
+                {trip.waypoints.length} {trip.waypoints.length === 1 ? 'Stop' : 'Stops'}
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              {trip.waypoints.map((waypoint, index) => (
+                <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
+                    {waypoint.order || index + 1}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-900">{waypoint.passengerName || 'Passenger'}</p>
+                    <p className="text-sm text-gray-600 truncate">{waypoint.address}</p>
+                  </div>
+                  {waypoint.distanceFromPrevious && (
+                    <div className="text-xs text-gray-500 flex-shrink-0">
+                      +{waypoint.distanceFromPrevious.toFixed(1)} km
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Live Tracking Map */}
         <LiveTrackingMap
           trip={trip}
           userRole={isDriver ? 'driver' : 'passenger'}
+          optimizedWaypoints={trip.waypoints || []}
         />
       </div>
+
+      {/* Trip Summary Modal */}
+      {showSummary && (
+        <TripSummary
+          tripId={tripId}
+          onClose={handleCloseSummary}
+        />
+      )}
     </div>
   );
 };
