@@ -25,6 +25,11 @@ import TestMockTrip from './pages/driver/TestMockTrip';
 import SearchTrips from './pages/passenger/SearchTrips';
 import PassengerTripTracking from './pages/passenger/PassengerTripTracking';
 
+// Epic-3 ESG / Impact Pages
+import MyImpact from './pages/impact/MyImpact';
+import OrgEsgDashboard from './pages/esg/OrgEsgDashboard';
+import PlatformEsgDashboard from './pages/esg/PlatformEsgDashboard';
+
 // Epic-4 Gamification & Rewards
 import PointsHistory from './pages/gamification/PointsHistory';
 import TierProgress from './pages/gamification/TierProgress';
@@ -114,6 +119,32 @@ function App() {
             element={
               <ProtectedRoute>
                 <ActiveTrip />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Epic-3 Impact / ESG Routes */}
+          <Route
+            path="/impact/my"
+            element={
+              <ProtectedRoute>
+                <MyImpact />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/org-admin/esg"
+            element={
+              <ProtectedRoute role="ORG_ADMIN">
+                <OrgEsgDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/platform/esg"
+            element={
+              <ProtectedRoute role="PLATFORM_ADMIN">
+                <PlatformEsgDashboard />
               </ProtectedRoute>
             }
           />

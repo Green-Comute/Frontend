@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { tripService } from '../../services/tripService';
 import { rideService } from '../../services/rideService';
@@ -14,7 +14,13 @@ const RideRequests = () => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Fetch driver's trips
+  // Refs so socket handler (set up once) always sees the latest state values
+  const selectedTripRef = useRef(null);
+  selectedTripRef.current = selectedTrip;
+  const tripsRef = useRef([]);
+  tripsRef.current = trips;
+
+  // Fetch driver's trips (initial load only — does NOT override current selection)
   useEffect(() => {
     fetchDriverTrips();
   }, []);
@@ -26,7 +32,7 @@ const RideRequests = () => {
     }
   }, [selectedTrip]);
 
-  // Setup socket for real-time ride request notifications
+  // Setup socket once — never reconnect just because selectedTrip changed
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     const socket = io('http://localhost:5000', {
@@ -40,10 +46,40 @@ const RideRequests = () => {
     // Listen for new ride requests
     socket.on('new-ride-request', (data) => {
       console.log('New ride request received:', data);
-      // Refresh trips and ride requests
-      fetchDriverTrips();
-      if (selectedTrip) {
-        fetchRideRequests(selectedTrip._id);
+
+      const incomingTripId =
+        data.rideRequest?.tripId?._id ||
+        data.rideRequest?.tripId ||
+        null;
+
+      // Always refresh trip list so pending counts stay accurate
+      fetchDriverTripsBackground();
+
+      if (incomingTripId) {
+        const incomingIdStr = String(incomingTripId);
+        const currentIdStr = selectedTripRef.current
+          ? String(selectedTripRef.current._id)
+          : null;
+
+        if (incomingIdStr === currentIdStr) {
+          // Already viewing this trip — just reload the requests panel
+          fetchRideRequests(incomingIdStr);
+        } else {
+          // Switch to the trip that received the request so it shows immediately
+          const targetTrip = tripsRef.current.find(
+            t => String(t._id) === incomingIdStr
+          );
+          if (targetTrip) {
+            // setSelectedTrip is a stable React setter — safe to call from stale closure
+            setSelectedTrip(targetTrip);
+            // useEffect([selectedTrip]) will fire fetchRideRequests automatically
+          } else {
+            // Trip not in local list yet (race condition) — fetch requests directly
+            fetchRideRequests(incomingIdStr);
+          }
+        }
+      } else if (selectedTripRef.current) {
+        fetchRideRequests(String(selectedTripRef.current._id));
       }
     });
 
@@ -54,22 +90,40 @@ const RideRequests = () => {
     return () => {
       socket.disconnect();
     };
-  }, [selectedTrip]);
+  }, []);
 
+  // Initial load: shows loading spinner, then auto-selects the first trip
+  // that has pending ride requests; falls back to trips[0] if none do.
   const fetchDriverTrips = async () => {
     try {
       setLoading(true);
       const data = await tripService.getDriverTrips();
-      setTrips(data.trips || []);
+      const fetchedTrips = data.trips || [];
+      setTrips(fetchedTrips);
 
-      // Auto-select first trip if available
-      if (data.trips && data.trips.length > 0) {
-        setSelectedTrip(data.trips[0]);
+      if (fetchedTrips.length > 0 && !selectedTripRef.current) {
+        // Prefer the first trip that passengers have already requested
+        const tripWithRequests = fetchedTrips.find(
+          t => (t.pendingRequestCount || 0) > 0
+        );
+        setSelectedTrip(tripWithRequests || fetchedTrips[0]);
       }
     } catch (err) {
       setError(err.message || 'Failed to fetch trips');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Background refresh: updates the trips list without a loading spinner
+  // and without overriding the driver's current trip selection
+  const fetchDriverTripsBackground = async () => {
+    try {
+      const data = await tripService.getDriverTrips();
+      setTrips(data.trips || []);
+      // Do NOT touch selectedTrip here — preserve the driver's current view
+    } catch (err) {
+      console.error('Background trip refresh failed:', err);
     }
   };
 
@@ -91,10 +145,10 @@ const RideRequests = () => {
 
       setSuccessMessage(`Ride request ${decision.toLowerCase()} successfully!`);
 
-      // Refresh ride requests and trips
+      // Refresh ride requests and trips in the background
       if (selectedTrip) {
         await fetchRideRequests(selectedTrip._id);
-        await fetchDriverTrips();
+        await fetchDriverTripsBackground();
       }
 
       // Clear success message after 3 seconds
@@ -115,8 +169,8 @@ const RideRequests = () => {
       await tripService.startTrip(tripId);
       setSuccessMessage('Trip started successfully!');
 
-      // Refresh trips
-      await fetchDriverTrips();
+      // Refresh trips in background
+      await fetchDriverTripsBackground();
 
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
@@ -133,8 +187,8 @@ const RideRequests = () => {
       await tripService.endTrip(tripId);
       setSuccessMessage('Trip ended successfully!');
 
-      // Refresh trips
-      await fetchDriverTrips();
+      // Refresh trips in background
+      await fetchDriverTripsBackground();
 
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
@@ -218,12 +272,19 @@ const RideRequests = () => {
                       onClick={() => setSelectedTrip(trip)}
                       className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedTrip?._id === trip._id
                           ? 'border-blue-500 bg-blue-50'
+                          : (trip.pendingRequestCount || 0) > 0
+                          ? 'border-orange-400 bg-orange-50'
                           : 'border-gray-200 hover:border-gray-300'
                         }`}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-medium text-gray-900">
+                        <h3 className="font-medium text-gray-900 flex items-center gap-2">
                           {trip.source} → {trip.destination}
+                          {(trip.pendingRequestCount || 0) > 0 && (
+                            <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 rounded-full bg-red-500 text-white text-xs font-bold">
+                              {trip.pendingRequestCount}
+                            </span>
+                          )}
                         </h3>
                         <span
                           className={`px-2 py-1 rounded text-xs font-medium ${trip.status === 'SCHEDULED'
