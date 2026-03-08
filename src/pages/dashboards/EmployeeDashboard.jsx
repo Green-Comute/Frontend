@@ -296,6 +296,20 @@ const EmployeeDashboard = () => {
           )}
         </div>
 
+        {/* 🌱 Green Impact */}
+        <div className="p-6 bg-white border border-emerald-200 rounded-xl shadow-sm">
+          <h3 className="font-semibold text-lg mb-2">🌱 My Green Impact</h3>
+          <p className="text-sm text-stone-600 mb-4">
+            Track your CO₂ savings, trees equivalent, and sustainability stats.
+          </p>
+          <button
+            onClick={() => navigate("/impact/my")}
+            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors w-full"
+          >
+            View My Impact
+          </button>
+        </div>
+
         {/* 🚗 Driver Card */}
         <div className="p-6 bg-white border rounded-xl shadow-sm">
           <h3 className="font-semibold text-lg mb-2">Become a Driver</h3>

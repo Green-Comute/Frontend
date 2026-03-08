@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, CheckCircle, Car, Trash2, UserX, Gift, Inbox, Shield, Eye } from "lucide-react";
+import { Users, CheckCircle, Car, Trash2, UserX, Eye } from "lucide-react";
 import { registerPasskey } from "../../services/passkeyService";
 
 const OrgAdminDashboard = () => {
@@ -151,43 +151,27 @@ const OrgAdminDashboard = () => {
             Organization Admin Dashboard
           </h1>
         </div>
-        <button
-          onClick={() => navigate('/admin/trips')}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium shadow-sm border"
-        >
-          <Car className="w-4 h-4" /> View All Org Rides
-        </button>
-      </div>
-
-      {/* Admin Navigation Actions */}
-      <div className="flex items-center gap-3">
-        {/* Epic-2 Driver Requests */}
-        <button
-          onClick={() => navigate("/admin/driver-requests")}
-          className="flex items-center gap-2 px-4 py-2 bg-stone-800 text-white font-medium rounded-lg hover:bg-stone-900 transition shadow-sm"
-        >
-          <Car className="w-4 h-4" /> Driver Requests
-        </button>
-
-        {/* Epic-4 Gamification & Rewards Admin */}
-        <button
-          onClick={() => navigate("/admin/redemptions")}
-          className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 transition shadow-sm"
-        >
-          <Inbox className="w-4 h-4" /> Redemptions
-        </button>
-        <button
-          onClick={() => navigate("/admin/rewards")}
-          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition shadow-sm"
-        >
-          <Gift className="w-4 h-4" /> Rewards Catalog
-        </button>
-        <button
-          onClick={() => navigate("/admin/tiers")}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition shadow-sm"
-        >
-          <Shield className="w-4 h-4" /> Tiers
-        </button>
+      <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate('/admin/trips')}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium shadow-sm border"
+          >
+            <Car className="w-4 h-4" /> View All Org Rides
+          </button>
+          <button
+            onClick={() => navigate("/admin/driver-requests")}
+            className="flex items-center gap-2 px-4 py-2 bg-stone-800 text-white rounded-lg hover:bg-stone-900 transition font-medium"
+          >
+            <Car className="w-4 h-4" />
+            Driver Requests
+          </button>
+          <button
+            onClick={() => navigate('/org-admin/esg')}
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-medium shadow-sm"
+          >
+            🌿 ESG Dashboard
+          </button>
+        </div>
       </div>
 
       {/* Pending Count */}

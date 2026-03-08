@@ -45,7 +45,6 @@ const ActiveTrip = () => {
 
   const user = getUserData();
 
-  // Define fetchTripDetails before useEffects that use it
   const fetchTripDetails = useCallback(async () => {
     try {
       setLoading(true);
@@ -61,7 +60,6 @@ const ActiveTrip = () => {
     } finally {
       setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tripId]);
 
   const fetchOptimizedRoute = useCallback(async () => {

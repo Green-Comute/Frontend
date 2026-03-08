@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { rideService } from '../../services/rideService';
 import { tripService } from '../../services/tripService';
 import LiveTrackingMap from '../../components/LiveTrackingMap';
+import TripSummary from '../../components/TripSummary';
 import { io } from 'socket.io-client';
 import calculateETA from '../../services/etaService';
 
@@ -18,10 +19,13 @@ const PassengerTripTracking = () => {
   const [cancelLoading, setCancelLoading] = useState(false);
   const [cancelSuccess, setCancelSuccess] = useState(false);
   const [tripCancelledAlert, setTripCancelledAlert] = useState(null);
+  const [showSummary, setShowSummary] = useState(false);
   const tripRef = useRef(null);
+  const rideRef = useRef(null);
 
-  // Keep tripRef in sync so socket handler always has fresh trip data
+  // Keep tripRef and rideRef in sync so socket handler always has fresh data
   useEffect(() => { tripRef.current = trip; }, [trip]);
+  useEffect(() => { rideRef.current = ride; }, [ride]);
 
   const fetchRideDetails = useCallback(async () => {
     try {
@@ -70,6 +74,10 @@ const PassengerTripTracking = () => {
     newSocket.on('locationUpdate', async (data) => {
       if (data.tripId !== ride.tripId._id) return;
 
+      // Stop ETA updates if passenger is dropped off (use ref for fresh state)
+      const currentRide = rideRef.current;
+      if (currentRide?.pickupStatus === 'DROPPED_OFF') return;
+
       // Use server-computed ETA if available
       if (data.eta) {
         setEta(data.eta);
@@ -98,6 +106,10 @@ const PassengerTripTracking = () => {
 
     newSocket.on('pickup-status-update', (data) => {
       if (data.rideId === rideId) {
+        // Show trip summary when passenger is dropped off
+        if (data.pickupStatus === 'DROPPED_OFF') {
+          setShowSummary(true);
+        }
         setRide(prev => ({
           ...prev,
           pickupStatus: data.pickupStatus
@@ -246,6 +258,16 @@ const PassengerTripTracking = () => {
 
   const statusInfo = getStatusInfo();
 
+  // Show trip summary when dropped off or trip completed
+  if (showSummary || trip.status === 'COMPLETED') {
+    return (
+      <TripSummary
+        tripId={trip._id}
+        onClose={() => navigate('/dashboard')}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
@@ -295,8 +317,8 @@ const PassengerTripTracking = () => {
             </h2>
             <p className="text-gray-600 text-lg">{statusInfo.message}</p>
 
-            {/* ── Inline ETA badge (only when trip is active and we have data) ── */}
-            {trip.status === 'STARTED' && eta && (
+            {/* ── Inline ETA badge (only when trip is active, not dropped off, and we have data) ── */}
+            {trip.status === 'STARTED' && ride.pickupStatus !== 'DROPPED_OFF' && eta && (
               <div
                 style={{
                   marginTop: '20px',
@@ -335,7 +357,7 @@ const PassengerTripTracking = () => {
             )}
 
             {/* Waiting for ETA */}
-            {trip.status === 'STARTED' && !eta && (
+            {trip.status === 'STARTED' && ride.pickupStatus !== 'DROPPED_OFF' && !eta && (
               <div
                 style={{
                   marginTop: '16px',
@@ -413,8 +435,10 @@ const PassengerTripTracking = () => {
         </div>
 
         {/* Live Map */}
-        {trip.status === 'STARTED' && (
-          <LiveTrackingMap trip={trip} userRole="passenger" />
+        {trip.status === 'STARTED' && ride.pickupStatus !== 'DROPPED_OFF' && (
+          <div className="mb-6">
+            <LiveTrackingMap trip={trip} userRole="passenger" />
+          </div>
         )}
 
         {/* Passenger Cancel Ride – only when trip is SCHEDULED and ride is cancellable */}
