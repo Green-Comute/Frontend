@@ -414,7 +414,9 @@ const PassengerTripTracking = () => {
 
         {/* Live Map */}
         {trip.status === 'STARTED' && (
-          <LiveTrackingMap trip={trip} userRole="passenger" />
+          <div className="mb-6">
+            <LiveTrackingMap trip={trip} userRole="passenger" />
+          </div>
         )}
 
         {/* Passenger Cancel Ride – only when trip is SCHEDULED and ride is cancellable */}
