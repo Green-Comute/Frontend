@@ -82,8 +82,14 @@ const SearchTrips = () => {
   const fetchPassengerRides = async () => {
     try {
       const data = await rideService.getPassengerRides();
-      // Extract trip IDs from passenger's rides
-      const requestedIds = (data.rides || []).map(ride => ride.trip?._id || ride.tripId).filter(Boolean);
+      // Extract trip IDs — tripId may be a populated object after .populate() or a raw string/ObjectId
+      const requestedIds = (data.rides || [])
+        .map(ride => {
+          const raw = ride.trip?._id ?? ride.tripId;
+          // If populated, raw is an object with ._id; otherwise it's already an ID string
+          return (raw?._id ?? raw)?.toString();
+        })
+        .filter(Boolean);
       setRequestedTripIds(requestedIds);
     } catch (err) {
       console.error('Failed to fetch passenger rides:', err);
@@ -102,6 +108,9 @@ const SearchTrips = () => {
     setSuccessMessage('');
     setLoading(true);
     setHasSearched(true);
+
+    // Refresh requested ride IDs so the button state is accurate after driver approvals
+    fetchPassengerRides();
 
     try {
       // Build search params with location data if available

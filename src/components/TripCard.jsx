@@ -5,7 +5,8 @@ import PropTypes from 'prop-types';
 const TripCard = ({ trip, onRequestRide, showRequestButton = false, showManageButton = false, requestedTripIds = [] }) => {
   const navigate = useNavigate();
   const [isRequesting, setIsRequesting] = useState(false);
-  const isRequested = requestedTripIds.includes(trip._id);
+  // requestedTripIds may contain strings or ObjectId-like values; normalise to string for safe comparison
+  const isRequested = requestedTripIds.some(id => id?.toString() === trip._id?.toString());
 
   const handleRequestRide = async () => {
     setIsRequesting(true);
