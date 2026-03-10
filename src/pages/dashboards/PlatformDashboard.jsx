@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Building2, UserPlus, Shield, Globe, Car } from "lucide-react";
+import { Building2, UserPlus, Shield, Globe, Car, FileWarning } from "lucide-react";
 import { registerPasskey } from "../../services/passkeyService";
 
 const PlatformDashboard = () => {
@@ -111,6 +111,12 @@ const PlatformDashboard = () => {
           className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium shadow-sm"
         >
           <Car className="w-4 h-4" /> View All Platform Rides
+        </button>
+        <button
+          onClick={() => navigate('/admin/incidents')}
+          className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition font-medium shadow-sm"
+        >
+          <FileWarning className="w-4 h-4" /> Incident Reports
         </button>
       </div>
 

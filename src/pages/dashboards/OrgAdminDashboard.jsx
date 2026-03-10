@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, CheckCircle, Car, Trash2, UserX, Eye } from "lucide-react";
+import { Users, CheckCircle, Car, Trash2, UserX, Eye, FileWarning } from "lucide-react";
 import { registerPasskey } from "../../services/passkeyService";
 
 const OrgAdminDashboard = () => {
@@ -170,6 +170,12 @@ const OrgAdminDashboard = () => {
             className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-medium shadow-sm"
           >
             🌿 ESG Dashboard
+          </button>
+          <button
+            onClick={() => navigate('/admin/incidents')}
+            className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition font-medium shadow-sm"
+          >
+            <FileWarning className="w-4 h-4" /> Incident Reports
           </button>
         </div>
       </div>
