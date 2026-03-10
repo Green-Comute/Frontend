@@ -62,7 +62,7 @@ const RedemptionQueue = () => {
     };
 
     return (
-        <div className="p-6 md:p-8 bg-stone-50 min-h-screen">
+        <div className="p-6 md:p-8 bg-stone-50 min-h-screen animate-fade-in">
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center gap-3 mb-8">
                     <div className="w-10 h-10 bg-amber-600 rounded-lg flex items-center justify-center shadow-sm">

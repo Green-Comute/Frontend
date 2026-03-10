@@ -37,11 +37,11 @@ const TripSummary = ({ tripId, onClose }) => {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
-        <div className="bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading trip summary...</p>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" role="dialog" aria-modal="true" aria-label="Loading trip summary">
+        <div className="bg-white rounded-xl shadow-2xl p-8 max-w-2xl w-full animate-slide-up">
+          <div className="flex flex-col items-center">
+            <div className="spinner w-10 h-10"></div>
+            <p className="mt-4 text-stone-600 text-sm">Loading trip summary...</p>
           </div>
         </div>
       </div>
@@ -50,18 +50,15 @@ const TripSummary = ({ tripId, onClose }) => {
 
   if (error || !summary) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
-        <div className="bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full">
-          <div className="text-center">
-            <div className="text-red-600 text-5xl mb-4">⚠️</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Error</h2>
-            <p className="text-gray-600 mb-6">{error || 'Failed to load summary'}</p>
-            <button
-              onClick={onClose}
-              className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-            >
-              Close
-            </button>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" role="dialog" aria-modal="true">
+        <div className="bg-white rounded-xl shadow-2xl p-8 max-w-2xl w-full animate-slide-up">
+          <div className="empty-state">
+            <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
+              <svg className="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
+            </div>
+            <h2 className="text-xl font-bold text-stone-900 mb-1">Something went wrong</h2>
+            <p className="text-stone-600 mb-6 text-sm">{error || 'Failed to load summary'}</p>
+            <button onClick={onClose} className="btn-primary">Close</button>
           </div>
         </div>
       </div>
@@ -97,10 +94,10 @@ const TripSummary = ({ tripId, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full my-8 max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" role="dialog" aria-modal="true" aria-label="Trip Summary">
+      <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full my-8 max-h-[90vh] flex flex-col animate-slide-up">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-lg">
+        <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white p-6 rounded-t-xl">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold">🎉 Trip Summary</h2>
@@ -291,11 +288,8 @@ const TripSummary = ({ tripId, onClose }) => {
         </div>
 
         {/* Footer Actions */}
-        <div className="bg-gray-50 px-6 py-4 rounded-b-lg border-t border-gray-200 flex justify-end space-x-3">
-          <button
-            onClick={onClose}
-            className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium"
-          >
+        <div className="bg-stone-50 px-6 py-4 rounded-b-xl border-t border-stone-200 flex justify-end">
+          <button onClick={onClose} className="btn-primary">
             Close
           </button>
         </div>

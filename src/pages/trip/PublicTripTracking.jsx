@@ -49,8 +49,8 @@ const PublicTripTracking = () => {
 
     if (loading)
         return (
-            <div className="min-h-screen flex items-center justify-center text-stone-500">
-                ⏳ Loading trip…
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="spinner"></div>
             </div>
         );
 
@@ -59,7 +59,7 @@ const PublicTripTracking = () => {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center max-w-sm">
-                    <div className="text-4xl mb-3">🔗</div>
+                    <svg className="w-10 h-10 text-stone-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m9.86-2.556a4.5 4.5 0 0 0-1.242-7.244l-4.5-4.5a4.5 4.5 0 0 0-6.364 6.364L4.343 8.21" /></svg>
                     <h2 className="text-xl font-bold text-stone-900 mb-2">Link unavailable</h2>
                     <p className="text-stone-500 text-sm">{error}</p>
                 </div>
@@ -70,8 +70,8 @@ const PublicTripTracking = () => {
     if (!trip) {
         console.warn('⚠️ [PublicTripTracking] Trip not loaded yet');
         return (
-            <div className="min-h-screen flex items-center justify-center text-stone-500">
-                ⏳ Trip data not available…
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="spinner"></div>
             </div>
         );
     }
@@ -81,17 +81,17 @@ const PublicTripTracking = () => {
     if (trip && (trip.status === 'STARTED' || trip.status === 'IN_PROGRESS')) {
         console.log('🗺️ [PublicTripTracking] Rendering live map for trip status:', trip.status);
         return (
-            <div className="min-h-screen bg-stone-50 py-8 px-4">
+            <div className="min-h-screen bg-stone-50 py-8 px-4 animate-fade-in">
                 <div className="max-w-6xl mx-auto">
                     {/* Header */}
                     <div className="mb-6">
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
                             <div>
-                                <h1 className="text-3xl font-bold text-stone-900">Live Trip Tracking</h1>
+                                <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight">Live Trip Tracking</h1>
                                 <p className="text-stone-600 mt-1">Real-time driver location (shared via GreenCommute)</p>
                             </div>
                             <span className={`text-sm font-semibold px-4 py-2 rounded-full ${statusClass}`}>
-                                {trip.status === 'STARTED' ? '🚗 In Progress' : '✓ Completed'}
+                                {trip.status === 'STARTED' ? 'In Progress' : 'Completed'}
                             </span>
                         </div>
                     </div>

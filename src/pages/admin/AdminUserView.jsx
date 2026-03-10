@@ -32,7 +32,7 @@ const AdminUserView = () => {
     const { user, points, tripsOffered, ridesTaken, pointHistory, redemptions } = data;
 
     return (
-        <div className="min-h-screen bg-stone-50 p-6 md:p-8">
+        <div className="min-h-screen bg-stone-50 p-6 md:p-8 animate-fade-in">
             <div className="max-w-6xl mx-auto space-y-6">
 
                 {/* Header */}

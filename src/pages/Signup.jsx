@@ -125,8 +125,8 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
+      <div className="w-full max-w-md animate-fade-in">
         <button
           onClick={() => navigate("/")}
           className="mb-6 text-stone-600 hover:text-emerald-700 transition-colors font-medium"
@@ -149,8 +149,9 @@ const Signup = () => {
           </h2>
 
           {error && (
-            <div className="mb-5 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-              {error}
+            <div className="mb-5 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex items-start gap-2" role="alert">
+              <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>
+              <span>{error}</span>
             </div>
           )}
 
@@ -215,10 +216,10 @@ const Signup = () => {
                 <button
                   type="submit"
                   disabled={otpSending}
-                  className="w-full py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-semibold text-lg disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="btn-primary w-full py-3 text-lg flex items-center justify-center gap-2"
                 >
                   {otpSending ? (
-                    "Sending verification code..."
+                    <><span className="spinner" /> Sending verification code...</>
                   ) : (
                     <>
                       <Mail className="w-5 h-5" />
@@ -252,15 +253,15 @@ const Signup = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-semibold text-lg disabled:opacity-50"
+                  className="btn-primary w-full py-3 text-lg flex items-center justify-center gap-2"
                 >
-                  {loading ? "Creating account..." : "Complete Sign Up"}
+                  {loading ? <><span className="spinner" /> Creating account...</> : "Complete Sign Up"}
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setStep("form")}
-                  className="w-full py-2 text-stone-600 hover:text-stone-800 text-sm transition"
+                  className="btn-secondary w-full py-2 text-sm"
                 >
                   ← Back to form
                 </button>

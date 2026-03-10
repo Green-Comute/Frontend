@@ -147,22 +147,22 @@ const CreateTrip = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-lg shadow-md p-8">
+    <div className="min-h-screen bg-stone-50 py-8 px-4">
+      <div className="max-w-2xl mx-auto animate-fade-in">
+        <div className="card p-6 sm:p-8">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Create New Trip</h1>
-            <p className="text-gray-600 mt-2">Fill in the details to create a new ride</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight">Create New Trip</h1>
+            <p className="text-stone-600 mt-2">Fill in the details to create a new ride</p>
           </div>
 
           {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm" role="alert">
               {error}
             </div>
           )}
 
           {success && (
-            <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+            <div className="mb-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-sm" role="status">
               {success}
             </div>
           )}
@@ -186,8 +186,8 @@ const CreateTrip = () => {
 
             {/* Route Preview */}
             {((sourceLocation?.lat && sourceLocation?.lng) || (destinationLocation?.lat && destinationLocation?.lng)) && (
-              <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Route Preview</h3>
+              <div className="border border-stone-200 rounded-lg p-4 bg-stone-50">
+                <h3 className="text-sm font-medium text-stone-700 mb-3">Route Preview</h3>
                 <MapView
                   sourceLocation={sourceLocation}
                   destinationLocation={destinationLocation}
@@ -196,17 +196,17 @@ const CreateTrip = () => {
                 {sourceLocation && destinationLocation && (
                   <div className="mt-3 space-y-2 text-sm">
                     <div className="flex items-start space-x-2">
-                      <div className="w-3 h-3 bg-green-500 rounded-full mt-1 flex-shrink-0"></div>
+                      <div className="w-3 h-3 bg-emerald-500 rounded-full mt-1 flex-shrink-0"></div>
                       <div className="flex-1">
-                        <div className="font-medium text-gray-900">Start</div>
-                        <div className="text-gray-600 text-xs">{sourceLocation.address}</div>
+                        <div className="font-medium text-stone-900">Start</div>
+                        <div className="text-stone-600 text-xs">{sourceLocation.address}</div>
                       </div>
                     </div>
                     <div className="flex items-start space-x-2">
                       <div className="w-3 h-3 bg-red-500 rounded-full mt-1 flex-shrink-0"></div>
                       <div className="flex-1">
-                        <div className="font-medium text-gray-900">End</div>
-                        <div className="text-gray-600 text-xs">{destinationLocation.address}</div>
+                        <div className="font-medium text-stone-900">End</div>
+                        <div className="text-stone-600 text-xs">{destinationLocation.address}</div>
                       </div>
                     </div>
                     <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
@@ -218,9 +218,9 @@ const CreateTrip = () => {
             )}
 
             {/* Scheduled Date and Time */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <label className="block">
-                <span className="text-sm font-medium text-gray-700 block mb-2">Scheduled Date *</span>
+                <span className="text-sm font-medium text-stone-700 block mb-2">Scheduled Date *</span>
                 <input
                   type="date"
                   name="scheduledDate"
@@ -229,25 +229,25 @@ const CreateTrip = () => {
                   min={getMinDate()}
                   max={getMaxDate()}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+                  className="input-field cursor-pointer"
                 />
-                <p className="text-xs text-gray-500 mt-1">Max 7 days from now</p>
+                <p className="text-xs text-stone-500 mt-1">Max 7 days from now</p>
               </label>
               <label className="block">
-                <span className="text-sm font-medium text-gray-700 block mb-2">Scheduled Time *</span>
+                <span className="text-sm font-medium text-stone-700 block mb-2">Scheduled Time *</span>
                 <input
                   type="time"
                   name="scheduledTime"
                   value={formData.scheduledTime}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+                  className="input-field cursor-pointer"
                 />
               </label>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-stone-700 mb-2">
                 Vehicle Type
               </label>
               <div className="flex space-x-4">
@@ -258,9 +258,9 @@ const CreateTrip = () => {
                     value="CAR"
                     checked={formData.vehicleType === 'CAR'}
                     onChange={handleChange}
-                    className="w-4 h-4 text-blue-600"
+                    className="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
                   />
-                  <span className="text-gray-700">Car</span>
+                  <span className="text-stone-700">Car</span>
                 </label>
                 <label className="flex items-center space-x-2 cursor-pointer">
                   <input
@@ -269,15 +269,15 @@ const CreateTrip = () => {
                     value="BIKE"
                     checked={formData.vehicleType === 'BIKE'}
                     onChange={handleChange}
-                    className="w-4 h-4 text-blue-600"
+                    className="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
                   />
-                  <span className="text-gray-700">Bike</span>
+                  <span className="text-stone-700">Bike</span>
                 </label>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-stone-700 mb-2">
                 Total Seats
               </label>
               <input
@@ -289,9 +289,9 @@ const CreateTrip = () => {
                 max={formData.vehicleType === 'BIKE' ? 1 : 7}
                 disabled={formData.vehicleType === 'BIKE'}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+                className="input-field disabled:bg-stone-100"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-stone-500 mt-1">
                 {formData.vehicleType === 'BIKE'
                   ? 'Bike: 1 seat (fixed)'
                   : 'Car: 1-7 seats'}
@@ -307,9 +307,9 @@ const CreateTrip = () => {
             <button
               type="submit"
               disabled={loading || !formData.fuelType}
-              className="w-full py-3 px-4 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="btn-primary w-full py-3 flex items-center justify-center gap-2"
             >
-              {loading ? 'Creating Trip...' : 'Create Trip'}
+              {loading ? <><span className="spinner" /> Creating Trip...</> : 'Create Trip'}
             </button>
           </form>
 

@@ -39,7 +39,7 @@ const PointsHistory = () => {
     };
 
     return (
-        <div className="min-h-screen bg-stone-50 p-6 md:p-8">
+        <div className="min-h-screen bg-stone-50 p-6 md:p-8 animate-fade-in">
             {/* Header */}
             <div className="max-w-4xl mx-auto">
                 <button

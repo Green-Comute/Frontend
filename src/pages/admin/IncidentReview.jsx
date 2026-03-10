@@ -156,7 +156,7 @@ const IncidentReview = () => {
     const handleReviewed = () => { setLoading(true); setRefreshKey((k) => k + 1); };
 
     return (
-        <div className="max-w-3xl mx-auto p-6 md:p-8 space-y-5">
+        <div className="max-w-3xl mx-auto p-6 md:p-8 space-y-5 animate-fade-in">
             <div className="flex items-center gap-3">
                 <FileWarning className="w-8 h-8 text-amber-500" />
                 <div>

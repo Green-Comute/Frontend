@@ -57,7 +57,7 @@ const RewardsCatalog = () => {
     };
 
     return (
-        <div className="min-h-screen bg-stone-50 p-6 md:p-8">
+        <div className="min-h-screen bg-stone-50 p-6 md:p-8 animate-fade-in">
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -112,7 +112,7 @@ const RewardsCatalog = () => {
 
                 {/* Catalog Grid */}
                 {loading ? (
-                    <div className="p-12 text-center text-stone-500">Loading rewards catalog...</div>
+                    <div className="p-12 text-center text-stone-500"><div className="spinner mx-auto"></div><p className="mt-4">Loading rewards catalog...</p></div>
                 ) : items.length === 0 ? (
                     <div className="bg-white rounded-xl border shadow-sm p-12 text-center">
                         <Package className="w-12 h-12 text-stone-300 mx-auto mb-3" />

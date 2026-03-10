@@ -43,10 +43,10 @@ const SafetyGuidelines = () => {
         }
     };
 
-    if (loading) return <div className="p-8 text-stone-500">Loading guidelines…</div>;
+    if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="spinner"></div></div>;
 
     return (
-        <div className="max-w-2xl mx-auto p-6 md:p-8">
+        <div className="max-w-2xl mx-auto p-6 md:p-8 animate-fade-in">
             <div className="flex items-center gap-3 mb-6">
                 <ShieldCheck className="w-8 h-8 text-emerald-600" />
                 <div>

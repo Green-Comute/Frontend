@@ -51,7 +51,7 @@ const NewTicketForm = ({ onCreated }) => {
                 <select
                     value={form.issueType}
                     onChange={(e) => setForm({ ...form, issueType: e.target.value })}
-                    className="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"
+                    className="w-full input-field"
                 >
                     {ISSUE_TYPES.map((t) => (
                         <option key={t} value={t}>{t.charAt(0) + t.slice(1).toLowerCase()}</option>
@@ -68,7 +68,7 @@ const NewTicketForm = ({ onCreated }) => {
                     placeholder="Describe your issue in detail…"
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    className="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="input-field resize-none"
                 />
                 <p className="text-xs text-stone-400 mt-1">{form.message.length} / 2000</p>
             </div>
@@ -187,7 +187,7 @@ const SupportTickets = () => {
     };
 
     return (
-        <div className="max-w-2xl mx-auto p-6 md:p-8 space-y-6">
+        <div className="max-w-2xl mx-auto p-6 md:p-8 space-y-6 animate-fade-in">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <LifeBuoy className="w-8 h-8 text-emerald-600" />

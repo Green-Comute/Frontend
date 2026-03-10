@@ -88,54 +88,54 @@ const PlatformDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 p-8 space-y-10">
+    <div className="page-container animate-fade-in space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
             <Shield className="w-8 h-8 text-emerald-600" />
-            <h1 className="text-3xl font-bold text-stone-900">
+            <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight">
               Platform Admin Dashboard
             </h1>
         </div>
+        <div className="flex flex-wrap items-center gap-2">
         <button
           onClick={() => navigate("/platform/esg")}
-          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
+          className="btn-primary flex items-center gap-2 text-sm"
         >
           <Globe className="w-4 h-4" />
           Global ESG Stats
         </button>
-        </div>
         <button
           onClick={() => navigate('/admin/trips')}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium shadow-sm"
+          className="btn-secondary flex items-center gap-2 text-sm"
         >
-          <Car className="w-4 h-4" /> View All Platform Rides
+          <Car className="w-4 h-4" /> All Rides
         </button>
         <button
           onClick={() => navigate('/admin/incidents')}
-          className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition font-medium shadow-sm"
+          className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition font-medium shadow-sm text-sm"
         >
-          <FileWarning className="w-4 h-4" /> Incident Reports
+          <FileWarning className="w-4 h-4" /> Incidents
         </button>
+        </div>
       </div>
 
       {/* Create Organization */}
-      <section className="bg-white border rounded-xl p-6 shadow">
+      <section className="card p-6">
         <div className="flex items-center gap-2 mb-4">
           <Building2 className="w-5 h-5 text-emerald-600" />
-          <h2 className="text-xl font-semibold">Create Organization</h2>
+          <h2 className="text-lg font-semibold text-stone-900">Create Organization</h2>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid sm:grid-cols-2 gap-4">
           <input
-            className="border rounded-lg px-4 py-2"
+            className="input-field"
             placeholder="Organization Name"
             value={orgData.name}
             onChange={(e) => setOrgData({ ...orgData, name: e.target.value })}
           />
           <input
-            className="border rounded-lg px-4 py-2"
+            className="input-field"
             placeholder="Org Code (e.g. AMRITA2024)"
             value={orgData.orgCode}
             onChange={(e) =>
@@ -149,7 +149,7 @@ const PlatformDashboard = () => {
             Allowed Email Domains (comma-separated, optional)
           </label>
           <input
-            className="w-full border rounded-lg px-4 py-2"
+            className="input-field"
             placeholder="e.g. amrita.edu, tcs.com"
             value={orgData.allowedDomains}
             onChange={(e) =>
@@ -164,7 +164,7 @@ const PlatformDashboard = () => {
 
         <button
           onClick={handleCreateOrg}
-          className="mt-4 px-5 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+          className="btn-primary mt-4"
         >
           Create Organization
         </button>
@@ -172,23 +172,23 @@ const PlatformDashboard = () => {
 
       {/* Organizations List */}
       {organizations.length > 0 && (
-        <section className="bg-white border rounded-xl p-6 shadow">
+        <section className="card p-6">
           <div className="flex items-center gap-2 mb-4">
             <Globe className="w-5 h-5 text-stone-700" />
-            <h2 className="text-xl font-semibold">
+            <h2 className="text-lg font-semibold text-stone-900">
               Organizations ({organizations.length})
             </h2>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
-              <thead className="bg-stone-100">
-                <tr className="border-b">
-                  <th className="text-left p-3 text-sm">Name</th>
-                  <th className="text-left p-3 text-sm">Code</th>
-                  <th className="text-left p-3 text-sm">Allowed Domains</th>
-                  <th className="text-left p-3 text-sm">Status</th>
-                  <th className="text-left p-3 text-sm">Created</th>
+              <thead className="bg-stone-50">
+                <tr className="border-b border-stone-200">
+                  <th className="text-left p-3 text-sm font-medium text-stone-600">Name</th>
+                  <th className="text-left p-3 text-sm font-medium text-stone-600">Code</th>
+                  <th className="text-left p-3 text-sm font-medium text-stone-600">Allowed Domains</th>
+                  <th className="text-left p-3 text-sm font-medium text-stone-600">Status</th>
+                  <th className="text-left p-3 text-sm font-medium text-stone-600">Created</th>
                 </tr>
               </thead>
               <tbody>
@@ -207,10 +207,7 @@ const PlatformDashboard = () => {
                     </td>
                     <td className="p-3">
                       <span
-                        className={`text-xs px-2 py-1 rounded ${org.isActive
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                          }`}
+                        className={org.isActive ? "badge-success" : "badge-danger"}
                       >
                         {org.isActive ? "Active" : "Inactive"}
                       </span>
@@ -227,15 +224,15 @@ const PlatformDashboard = () => {
       )}
 
       {/* Create Org Admin */}
-      <section className="bg-white border rounded-xl p-6 shadow">
+      <section className="card p-6">
         <div className="flex items-center gap-2 mb-4">
           <UserPlus className="w-5 h-5 text-emerald-600" />
-          <h2 className="text-xl font-semibold">Create Org Admin</h2>
+          <h2 className="text-lg font-semibold text-stone-900">Create Org Admin</h2>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid sm:grid-cols-2 gap-4">
           <input
-            className="border rounded-lg px-4 py-2"
+            className="input-field"
             placeholder="Admin Email"
             value={adminData.email}
             onChange={(e) =>
@@ -243,7 +240,7 @@ const PlatformDashboard = () => {
             }
           />
           <input
-            className="border rounded-lg px-4 py-2"
+            className="input-field"
             placeholder="Phone"
             value={adminData.phone}
             onChange={(e) =>
@@ -251,7 +248,7 @@ const PlatformDashboard = () => {
             }
           />
           <input
-            className="border rounded-lg px-4 py-2"
+            className="input-field"
             placeholder="Temporary Password"
             type="password"
             value={adminData.password}
@@ -260,7 +257,7 @@ const PlatformDashboard = () => {
             }
           />
           <select
-            className="border rounded-lg px-4 py-2 bg-white"
+            className="input-field bg-white"
             value={adminData.orgCode}
             onChange={(e) =>
               setAdminData({ ...adminData, orgCode: e.target.value })
@@ -277,17 +274,17 @@ const PlatformDashboard = () => {
 
         <button
           onClick={handleCreateOrgAdmin}
-          className="mt-4 px-5 py-2 bg-stone-900 text-white rounded-lg hover:bg-stone-800"
+          className="btn-secondary mt-4"
         >
           Create Org Admin
         </button>
       </section>
 
       {/* Security / Passkey */}
-      <section className="bg-white border rounded-xl p-6 shadow">
+      <section className="card p-6">
         <div className="flex items-center gap-2 mb-4">
           <Shield className="w-5 h-5 text-emerald-600" />
-          <h2 className="text-xl font-semibold">Security</h2>
+          <h2 className="text-lg font-semibold text-stone-900">Security</h2>
         </div>
         <p className="text-sm text-stone-600 mb-4">
           Register a passkey (Touch ID / Face ID) to sign in without a password.
@@ -295,10 +292,10 @@ const PlatformDashboard = () => {
         <button
           onClick={handleRegisterPasskey}
           disabled={passkeyStatus === "loading"}
-          className="px-5 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+          className="btn-primary flex items-center gap-2"
         >
           {passkeyStatus === "loading"
-            ? "Registering..."
+            ? <><span className="spinner" /> Registering...</>
             : "Register a Passkey"}
         </button>
         {passkeyStatus === "success" && (

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { MapPin, Clock, Check, X } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 const RideRequestCard = ({ rideRequest, onDecision }) => {
@@ -13,96 +14,63 @@ const RideRequestCard = ({ rideRequest, onDecision }) => {
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'APPROVED':
-        return 'bg-green-100 text-green-800';
-      case 'REJECTED':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+  const statusBadge = {
+    PENDING: 'badge-warning',
+    APPROVED: 'badge-success',
+    REJECTED: 'badge-danger',
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">
+    <article className="card p-5">
+      <div className="flex justify-between items-start mb-3 gap-2">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-base font-semibold text-stone-900 truncate">
             {rideRequest.passengerId?.name || 'Unknown Passenger'}
           </h3>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-stone-500 mt-0.5 truncate">
             {rideRequest.passengerId?.email}
           </p>
         </div>
-        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(rideRequest.status)}`}>
+        <span className={`badge flex-shrink-0 ${statusBadge[rideRequest.status] || 'badge-neutral'}`}>
           {rideRequest.status}
         </span>
       </div>
 
       <div className="space-y-2 mb-4">
-        <div className="flex items-center text-sm text-gray-600">
-          <svg
-            className="w-4 h-4 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-          </svg>
-          {rideRequest.tripId?.source} → {rideRequest.tripId?.destination}
+        <div className="flex items-center text-sm text-stone-600 gap-2">
+          <MapPin className="w-4 h-4 text-stone-400 flex-shrink-0" aria-hidden="true" />
+          <span className="truncate">{rideRequest.tripId?.source} → {rideRequest.tripId?.destination}</span>
         </div>
 
-        <div className="flex items-center text-sm text-gray-600">
-          <svg
-            className="w-4 h-4 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          Requested: {new Date(rideRequest.createdAt).toLocaleString()}
+        <div className="flex items-center text-sm text-stone-600 gap-2">
+          <Clock className="w-4 h-4 text-stone-400 flex-shrink-0" aria-hidden="true" />
+          <span>Requested: {new Date(rideRequest.createdAt).toLocaleString()}</span>
         </div>
       </div>
 
       {rideRequest.status === 'PENDING' && (
-        <div className="flex space-x-3">
+        <div className="flex gap-3">
           <button
             onClick={() => handleDecision('APPROVED')}
             disabled={isProcessing}
-            className="flex-1 py-2 px-4 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="flex-1 py-2.5 px-4 bg-emerald-600 text-white rounded-lg font-medium text-sm hover:bg-emerald-700 active:bg-emerald-800 transition-colors disabled:bg-stone-300 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+            aria-label={`Approve ride request from ${rideRequest.passengerId?.name}`}
           >
+            <Check className="w-4 h-4" aria-hidden="true" />
             {isProcessing ? 'Processing...' : 'Approve'}
           </button>
           <button
             onClick={() => handleDecision('REJECTED')}
             disabled={isProcessing}
-            className="flex-1 py-2 px-4 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="flex-1 py-2.5 px-4 bg-red-600 text-white rounded-lg font-medium text-sm hover:bg-red-700 active:bg-red-800 transition-colors disabled:bg-stone-300 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+            aria-label={`Reject ride request from ${rideRequest.passengerId?.name}`}
           >
+            <X className="w-4 h-4" aria-hidden="true" />
             {isProcessing ? 'Processing...' : 'Reject'}
           </button>
         </div>
       )}
-    </div>
+    </article>
   );
 };
 

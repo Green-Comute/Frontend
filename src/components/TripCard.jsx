@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Clock, Car, IndianRupee, MapPin } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 const TripCard = ({ trip, onRequestRide, showRequestButton = false, showManageButton = false, requestedTripIds = [] }) => {
   const navigate = useNavigate();
   const [isRequesting, setIsRequesting] = useState(false);
-  // requestedTripIds may contain strings or ObjectId-like values; normalise to string for safe comparison
   const isRequested = requestedTripIds.some(id => id?.toString() === trip._id?.toString());
 
   const handleRequestRide = async () => {
@@ -28,81 +28,46 @@ const TripCard = ({ trip, onRequestRide, showRequestButton = false, showManageBu
     });
   };
 
+  const statusConfig = {
+    SCHEDULED: 'badge-info',
+    IN_PROGRESS: 'badge-success',
+    STARTED: 'badge-success',
+    COMPLETED: 'badge-neutral',
+    CANCELLED: 'badge-danger',
+  };
+
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">
+    <article className="card p-5 flex flex-col">
+      <div className="flex justify-between items-start mb-3 gap-2">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-base font-semibold text-stone-900 truncate">
+            <MapPin className="w-4 h-4 inline text-emerald-600 mr-1" aria-hidden="true" />
             {trip.source} → {trip.destination}
           </h3>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-stone-500 mt-0.5">
             Driver: {trip.driver?.name || 'Unknown'}
           </p>
         </div>
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-medium ${
-            trip.status === 'SCHEDULED'
-              ? 'bg-blue-100 text-blue-800'
-              : trip.status === 'IN_PROGRESS'
-              ? 'bg-green-100 text-green-800'
-              : 'bg-gray-100 text-gray-800'
-          }`}
-        >
+        <span className={`badge flex-shrink-0 ${statusConfig[trip.status] || 'badge-neutral'}`}>
           {trip.status}
         </span>
       </div>
 
-      <div className="space-y-2 mb-4">
-        <div className="flex items-center text-sm text-gray-600">
-          <svg
-            className="w-4 h-4 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          {formatDate(trip.scheduledTime)}
+      <div className="space-y-2 mb-4 flex-1">
+        <div className="flex items-center text-sm text-stone-600 gap-2">
+          <Clock className="w-4 h-4 text-stone-400 flex-shrink-0" aria-hidden="true" />
+          <span>{formatDate(trip.scheduledTime)}</span>
         </div>
 
-        <div className="flex items-center text-sm text-gray-600">
-          <svg
-            className="w-4 h-4 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
-            />
-          </svg>
-          {trip.vehicleType} • {trip.availableSeats} seat{trip.availableSeats !== 1 ? 's' : ''} available
+        <div className="flex items-center text-sm text-stone-600 gap-2">
+          <Car className="w-4 h-4 text-stone-400 flex-shrink-0" aria-hidden="true" />
+          <span>{trip.vehicleType} · {trip.availableSeats} seat{trip.availableSeats !== 1 ? 's' : ''} available</span>
         </div>
 
         {trip.estimatedCost && (
-          <div className="flex items-center text-sm text-gray-600">
-            <svg
-              className="w-4 h-4 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            ₹{trip.estimatedCost}
+          <div className="flex items-center text-sm text-stone-600 gap-2">
+            <IndianRupee className="w-4 h-4 text-stone-400 flex-shrink-0" aria-hidden="true" />
+            <span>₹{trip.estimatedCost}</span>
           </div>
         )}
       </div>
@@ -111,13 +76,18 @@ const TripCard = ({ trip, onRequestRide, showRequestButton = false, showManageBu
         <button
           onClick={handleRequestRide}
           disabled={isRequesting || isRequested || trip.availableSeats === 0}
-          className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
+          className={`w-full py-2.5 px-4 rounded-lg font-medium text-sm transition-all duration-200 ${
             isRequested
-              ? 'bg-gray-200 text-gray-600 cursor-not-allowed'
+              ? 'bg-stone-100 text-stone-500 cursor-not-allowed'
               : trip.availableSeats === 0
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-emerald-600 text-white hover:bg-emerald-700'
+              ? 'bg-stone-200 text-stone-400 cursor-not-allowed'
+              : 'btn-primary'
           }`}
+          aria-label={
+            isRequested ? 'Ride already requested'
+              : trip.availableSeats === 0 ? 'No seats available'
+              : `Request ride from ${trip.source} to ${trip.destination}`
+          }
         >
           {isRequesting
             ? 'Requesting...'
@@ -132,12 +102,12 @@ const TripCard = ({ trip, onRequestRide, showRequestButton = false, showManageBu
       {showManageButton && (
         <button
           onClick={() => navigate(`/driver/trip/${trip._id}`)}
-          className="w-full py-2 px-4 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
+          className="btn-primary w-full text-sm"
         >
-          {trip.status === 'STARTED' ? '🚗 Track Trip' : '📋 Manage Trip'}
+          {trip.status === 'STARTED' ? 'Track Trip' : 'Manage Trip'}
         </button>
       )}
-    </div>
+    </article>
   );
 };
 

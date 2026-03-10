@@ -185,10 +185,10 @@ const PrivacySettings = () => {
     };
 
     const loading = gamifLoading || privLoading || gpsLoading || tutorialLoading;
-    if (loading) return <div className="p-8 text-stone-500">Loading settings…</div>;
+    if (loading) return <div className="min-h-screen bg-stone-50 flex items-center justify-center"><div className="spinner"></div></div>;
 
     return (
-        <div className="max-w-2xl mx-auto p-6 md:p-8 space-y-8">
+        <div className="max-w-2xl mx-auto p-6 md:p-8 space-y-8 animate-fade-in">
             <div className="flex items-center gap-3">
                 <Settings className="w-8 h-8 text-stone-700" />
                 <h1 className="text-2xl font-bold text-stone-900">Privacy & Settings</h1>
@@ -319,14 +319,14 @@ const PrivacySettings = () => {
                         placeholder="Your current password"
                         value={deletePassword}
                         onChange={(e) => setDeletePassword(e.target.value)}
-                        className="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"
+                        className="input-field"
                     />
                     <input
                         required
                         placeholder='Type DELETE to confirm'
                         value={deleteConfirm}
                         onChange={(e) => setDeleteConfirm(e.target.value)}
-                        className="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"
+                        className="input-field"
                     />
                     {deleteError && <p className="text-xs text-red-500">{deleteError}</p>}
                     <button

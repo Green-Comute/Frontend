@@ -82,7 +82,7 @@ const TierConfigPage = () => {
     if (loading) return <div className="p-8">Loading tier configuration...</div>;
 
     return (
-        <div className="p-6 md:p-8 bg-stone-50 min-h-screen">
+        <div className="p-6 md:p-8 bg-stone-50 min-h-screen animate-fade-in">
             <div className="max-w-5xl mx-auto">
                 <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-3">

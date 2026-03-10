@@ -83,43 +83,44 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
+      <div className="w-full max-w-md animate-fade-in">
         {/* Back Button */}
         <button
           onClick={() => navigate("/")}
-          className="mb-6 text-stone-600 hover:text-emerald-700 font-medium"
+          className="mb-4 text-sm text-stone-600 hover:text-emerald-700 font-medium transition-colors"
         >
           ← Back to home
         </button>
 
         {/* Login Card */}
-        <div className="bg-white rounded-2xl shadow-xl border border-stone-200 p-8">
+        <div className="bg-white rounded-2xl shadow-xl border border-stone-200 p-6 sm:p-8">
           {/* Logo */}
-          <div className="flex items-center justify-center gap-2 mb-8">
-            <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center">
-              <Leaf className="w-7 h-7 text-white" />
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-sm">
+              <Leaf className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-stone-800">
+            <span className="text-xl font-bold text-stone-800">
               GreenCommute
             </span>
           </div>
 
-          <h2 className="text-2xl font-bold text-stone-900 text-center mb-2">
+          <h2 className="text-xl sm:text-2xl font-bold text-stone-900 text-center mb-1">
             Welcome Back
           </h2>
-          <p className="text-stone-600 text-center mb-8">
+          <p className="text-sm text-stone-500 text-center mb-6">
             Sign in to continue your journey
           </p>
 
           {/* Error */}
           {error && (
-            <div className="mb-5 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-              {error}
+            <div className="mb-5 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex items-start gap-2" role="alert">
+              <svg className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/></svg>
+              <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <InputField
               label="Email"
               type="email"
@@ -144,7 +145,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => navigate("/forgot-password")}
-                className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
               >
                 Forgot password?
               </button>
@@ -153,9 +154,16 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-semibold text-lg shadow disabled:opacity-50"
+              className="btn-primary w-full py-3 text-base"
             >
-              {loading ? "Signing In..." : "Sign In"}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="spinner w-4 h-4 border-2 border-white/30 border-t-white"></span>
+                  Signing In...
+                </span>
+              ) : (
+                "Sign In"
+              )}
             </button>
           </form>
 
@@ -171,7 +179,7 @@ const Login = () => {
             type="button"
             onClick={handlePasskeyLogin}
             disabled={passkeyLoading}
-            className="w-full py-3 flex items-center justify-center gap-2 border-2 border-stone-300 rounded-lg hover:border-emerald-500 hover:text-emerald-700 font-semibold text-stone-700 transition-colors disabled:opacity-50"
+            className="btn-secondary w-full py-3 flex items-center justify-center gap-2"
           >
             <Fingerprint className="w-5 h-5" />
             {passkeyLoading ? "Verifying..." : "Sign in with Passkey"}
@@ -180,19 +188,19 @@ const Login = () => {
             Touch ID · Face ID · Device PIN
           </p>
 
-          <p className="text-center text-stone-600 mt-4">
+          <p className="text-center text-sm text-stone-600 mt-5">
             Don&apos;t have an account?{" "}
             <button
               onClick={() => navigate("/signup")}
-              className="text-emerald-600 hover:text-emerald-700 font-semibold"
+              className="text-emerald-600 hover:text-emerald-700 font-semibold transition-colors"
             >
               Sign up
             </button>
           </p>
         </div>
 
-        <div className="mt-6 text-center text-sm text-stone-500 flex items-center justify-center gap-2">
-          <Shield className="w-4 h-4" />
+        <div className="mt-5 text-center text-xs text-stone-400 flex items-center justify-center gap-2">
+          <Shield className="w-3.5 h-3.5" aria-hidden="true" />
           <span>Secure authentication with corporate email verification</span>
         </div>
       </div>

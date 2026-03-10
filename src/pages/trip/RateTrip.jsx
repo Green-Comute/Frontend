@@ -92,18 +92,18 @@ const RateTrip = () => {
         }
     };
 
-    if (loading) return <div className="p-8 text-stone-500">Loading trip details…</div>;
+    if (loading) return <div className="min-h-screen bg-stone-50 flex items-center justify-center"><div className="spinner"></div></div>;
     if (!trip) return <div className="p-8 text-red-500">{error || 'Trip not found.'}</div>;
 
     if (submitted) {
         return (
-            <div className="max-w-lg mx-auto p-8 text-center">
-                <div className="text-5xl mb-4">🌟</div>
+            <div className="max-w-lg mx-auto p-8 text-center animate-fade-in">
+                <Star className="w-12 h-12 text-amber-400 fill-amber-400 mx-auto mb-4" />
                 <h2 className="text-2xl font-bold text-stone-900 mb-2">Thanks for your feedback!</h2>
                 <p className="text-stone-500 mb-6">Your rating has been submitted. Ratings are revealed once both parties have reviewed.</p>
                 <button
                     onClick={() => navigate('/dashboard')}
-                    className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
+                    className="btn-primary"
                 >
                     Back to Dashboard
                 </button>
@@ -112,8 +112,8 @@ const RateTrip = () => {
     }
 
     return (
-        <div className="max-w-lg mx-auto p-6 md:p-8">
-            <h1 className="text-2xl font-bold text-stone-900 mb-1">Rate Your Trip</h1>
+        <div className="max-w-lg mx-auto p-6 md:p-8 animate-fade-in">
+            <h1 className="text-2xl font-bold text-stone-900 mb-1 tracking-tight">Rate Your Trip</h1>
             <p className="text-stone-500 text-sm mb-6">
                 {isDriver ? 'Rate the passenger(s) on this trip.' : 'Rate your driver for this trip.'}
                 {' '}Ratings are double-blind — visible only after both sides submit.
@@ -127,7 +127,7 @@ const RateTrip = () => {
                         <select
                             value={targetPassengerId}
                             onChange={(e) => setTargetPassengerId(e.target.value)}
-                            className="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"
+                            className="input-field"
                         >
                             <option value="">-- Select passenger --</option>
                             {passengers.map((p) => {
@@ -166,14 +166,14 @@ const RateTrip = () => {
                     <button
                         type="submit"
                         disabled={submitting}
-                        className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition disabled:opacity-50"
+                        className="flex-1 btn-primary disabled:opacity-50 flex items-center justify-center"
                     >
-                        {submitting ? 'Submitting…' : 'Submit Rating'}
+                        {submitting ? <><span className="spinner !w-4 !h-4 !border-white/30 !border-t-white mr-2"></span>Submitting…</> : 'Submit Rating'}
                     </button>
                     <button
                         type="button"
                         onClick={() => navigate('/dashboard')}
-                        className="px-4 py-2 border border-stone-300 text-stone-600 rounded-lg hover:bg-stone-50 transition"
+                        className="btn-secondary"
                     >
                         Skip
                     </button>

@@ -77,7 +77,7 @@ const RewardsCRUD = () => {
     };
 
     return (
-        <div className="p-6 md:p-8 bg-stone-50 min-h-screen">
+        <div className="p-6 md:p-8 bg-stone-50 min-h-screen animate-fade-in">
             <div className="max-w-6xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <div>

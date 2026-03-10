@@ -104,8 +104,8 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label, required })
   return (
     <div ref={wrapperRef} className="relative">
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {label} {required && <span className="text-red-500">*</span>}
+        <label className="block text-sm font-medium text-stone-700 mb-1.5">
+          {label} {required && <span className="text-red-500" aria-hidden="true">*</span>}
         </label>
       )}
       <input
@@ -114,52 +114,58 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label, required })
         onChange={handleInputChange}
         placeholder={placeholder}
         required={required}
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+        className="input-field"
         autoComplete="off"
+        role="combobox"
+        aria-expanded={showSuggestions && suggestions.length > 0}
+        aria-autocomplete="list"
       />
 
       {/* Loading indicator */}
       {isLoading && (
         <div className="absolute right-3 top-[42px] transform -translate-y-1/2">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+          <div className="spinner w-4 h-4"></div>
         </div>
       )}
 
       {/* Suggestions dropdown */}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-[1000] w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">{/* z-index raised to appear above map */}
+        <ul className="absolute z-[1000] w-full mt-1 bg-white border border-stone-200 rounded-lg shadow-lg max-h-60 overflow-y-auto" role="listbox">
           {suggestions.map((suggestion) => (
-            <div
+            <li
               key={suggestion.place_id}
               onClick={() => handleSuggestionClick(suggestion)}
-              className="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors"
+              className="px-4 py-3 hover:bg-emerald-50 cursor-pointer border-b border-stone-100 last:border-b-0 transition-colors"
+              role="option"
             >
-              <div className="flex items-start">
-                <span className="text-blue-600 mr-2 mt-1">📍</span>
-                <div className="flex-1">
-                  <div className="font-medium text-gray-900 text-sm">
+              <div className="flex items-start gap-2">
+                <span className="text-emerald-600 mt-0.5 flex-shrink-0" aria-hidden="true">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg>
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium text-stone-900 text-sm truncate">
                     {suggestion.name || suggestion.display_name.split(',')[0]}
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="text-xs text-stone-500 mt-0.5 line-clamp-2">
                     {suggestion.display_name}
                   </div>
                 </div>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
 
       {/* No results message */}
       {showSuggestions && !isLoading && suggestions.length === 0 && inputValue.length >= 3 && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-4 text-center text-gray-500 text-sm">
+        <div className="absolute z-50 w-full mt-1 bg-white border border-stone-200 rounded-lg shadow-lg p-4 text-center text-stone-500 text-sm">
           No locations found. Try a different search term.
         </div>
       )}
 
-      <p className="text-xs text-gray-500 mt-1">
+      <p className="text-xs text-stone-500 mt-1">
         {inputValue.length < 3
-          ? 'Type at least 3 characters to search locations'
+          ? 'Type at least 3 characters to search'
           : 'Select from suggestions or continue typing'
         }
       </p>

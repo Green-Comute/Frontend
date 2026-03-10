@@ -43,7 +43,7 @@ const GuidelinesAdmin = () => {
     };
 
     return (
-        <div className="max-w-2xl mx-auto p-6 md:p-8 space-y-6">
+        <div className="max-w-2xl mx-auto p-6 md:p-8 space-y-6 animate-fade-in">
             <div className="flex items-center gap-3">
                 <BookOpen className="w-8 h-8 text-emerald-600" />
                 <div>
