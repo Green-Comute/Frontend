@@ -237,7 +237,7 @@ const SearchTrips = () => {
                   type="button"
                   onClick={() => handleVehicleTypeFilter('CAR')}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${searchParams.vehicleType === 'CAR'
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-emerald-600 text-white'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                 >
@@ -247,7 +247,7 @@ const SearchTrips = () => {
                   type="button"
                   onClick={() => handleVehicleTypeFilter('BIKE')}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${searchParams.vehicleType === 'BIKE'
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-emerald-600 text-white'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                 >
@@ -259,7 +259,7 @@ const SearchTrips = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {loading ? 'Searching...' : 'Search Trips'}
             </button>

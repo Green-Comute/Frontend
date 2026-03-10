@@ -130,7 +130,7 @@ const TestMockTrip = () => {
               <div className="ml-4 border-l-2 border-blue-300 pl-4 space-y-3">
                 {trip.waypoints.map((wp, index) => (
                   <div key={index} className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                    <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
                       {wp.order || index + 1}
                     </div>
                     <div>

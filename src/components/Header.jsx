@@ -85,6 +85,22 @@ const Header = () => {
                 Leaderboard
               </button>
 
+              {/* Epic-5 Safety & Support Links */}
+
+              <button
+                onClick={() => navigate("/safety")}
+                className="text-stone-700 hover:text-emerald-700 font-medium transition"
+              >
+                Safety
+              </button>
+
+              <button
+                onClick={() => navigate("/support/tickets")}
+                className="text-stone-700 hover:text-emerald-700 font-medium transition"
+              >
+                Support
+              </button>
+
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-1 text-red-600 hover:text-red-700 font-medium transition ml-4"

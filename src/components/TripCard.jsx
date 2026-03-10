@@ -115,7 +115,7 @@ const TripCard = ({ trip, onRequestRide, showRequestButton = false, showManageBu
               ? 'bg-gray-200 text-gray-600 cursor-not-allowed'
               : trip.availableSeats === 0
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-emerald-600 text-white hover:bg-emerald-700'
           }`}
         >
           {isRequesting
@@ -131,7 +131,7 @@ const TripCard = ({ trip, onRequestRide, showRequestButton = false, showManageBu
       {showManageButton && (
         <button
           onClick={() => navigate(`/driver/trip/${trip._id}`)}
-          className="w-full py-2 px-4 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+          className="w-full py-2 px-4 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
         >
           {trip.status === 'STARTED' ? '🚗 Track Trip' : '📋 Manage Trip'}
         </button>

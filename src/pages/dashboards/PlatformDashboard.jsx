@@ -280,7 +280,7 @@ const PlatformDashboard = () => {
       {/* Security / Passkey */}
       <section className="bg-white border rounded-xl p-6 shadow">
         <div className="flex items-center gap-2 mb-4">
-          <Shield className="w-5 h-5 text-indigo-600" />
+          <Shield className="w-5 h-5 text-emerald-600" />
           <h2 className="text-xl font-semibold">Security</h2>
         </div>
         <p className="text-sm text-stone-600 mb-4">
@@ -289,7 +289,7 @@ const PlatformDashboard = () => {
         <button
           onClick={handleRegisterPasskey}
           disabled={passkeyStatus === "loading"}
-          className="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+          className="px-5 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
         >
           {passkeyStatus === "loading"
             ? "Registering..."

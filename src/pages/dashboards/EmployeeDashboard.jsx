@@ -260,7 +260,7 @@ const EmployeeDashboard = () => {
           </p>
           <button
             onClick={() => navigate("/passenger/search")}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full"
+            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors w-full"
           >
             Search Available Trips
           </button>
@@ -380,7 +380,7 @@ const EmployeeDashboard = () => {
           <button
             onClick={handleRegisterPasskey}
             disabled={passkeyStatus === "loading"}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
           >
             {passkeyStatus === "loading" ? "Registering..." : "Register a Passkey"}
           </button>
@@ -406,7 +406,7 @@ const EmployeeDashboard = () => {
             <p className="text-stone-600">You haven&apos;t requested any rides yet.</p>
             <button
               onClick={() => navigate("/passenger/search")}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
             >
               Find Your First Ride
             </button>
@@ -474,7 +474,7 @@ const EmployeeDashboard = () => {
                   <div className="mt-3">
                     <button
                       onClick={() => navigate(`/passenger/ride/${ride._id}`)}
-                      className="w-full px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition-colors"
+                      className="w-full px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium transition-colors"
                     >
                       {ride.tripId.status === 'STARTED' ? '🚗 Track Live' : '📍 View Details'}
                     </button>

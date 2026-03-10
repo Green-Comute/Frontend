@@ -307,7 +307,7 @@ const CreateTrip = () => {
             <button
               type="submit"
               disabled={loading || !formData.fuelType}
-              className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {loading ? 'Creating Trip...' : 'Create Trip'}
             </button>
@@ -316,7 +316,7 @@ const CreateTrip = () => {
           <div className="mt-6 text-center">
             <button
               onClick={() => navigate('/driver/requests')}
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="text-emerald-600 hover:text-emerald-700 font-medium"
             >
               ← Back to Ride Requests
             </button>

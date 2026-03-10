@@ -46,6 +46,15 @@ import AdminAllTrips from './pages/admin/AdminAllTrips';
 // Platform
 import PointRulesDashboard from './pages/platform/PointRulesDashboard';
 
+// Epic-5 Privacy, Safety & Feedback
+import RateTrip from './pages/trip/RateTrip';
+import PublicTripTracking from './pages/trip/PublicTripTracking';
+import SafetyHub from './pages/safety/SafetyHub';
+import SafetyGuidelines from './pages/safety/SafetyGuidelines';
+import SupportTickets from './pages/support/SupportTickets';
+import IncidentReview from './pages/admin/IncidentReview';
+import GuidelinesAdmin from './pages/admin/GuidelinesAdmin';
+
 function App() {
   return (
     <Router>
@@ -192,6 +201,19 @@ function App() {
 
           <Route path="/platform/point-rules" element={<ProtectedRoute role="PLATFORM_ADMIN"><PointRulesDashboard /></ProtectedRoute>} />
 
+          {/* Epic-5 Privacy, Safety & Feedback */}
+          {/* Public — no auth needed */}
+          <Route path="/track/:token" element={<PublicTripTracking />} />
+
+          {/* Authenticated user routes */}
+          <Route path="/trip/:tripId/rate" element={<ProtectedRoute><RateTrip /></ProtectedRoute>} />
+          <Route path="/safety" element={<ProtectedRoute><SafetyHub /></ProtectedRoute>} />
+          <Route path="/safety/guidelines" element={<ProtectedRoute><SafetyGuidelines /></ProtectedRoute>} />
+          <Route path="/support/tickets" element={<ProtectedRoute><SupportTickets /></ProtectedRoute>} />
+
+          {/* Admin routes */}
+          <Route path="/admin/incidents" element={<ProtectedRoute role="ORG_ADMIN"><IncidentReview /></ProtectedRoute>} />
+          <Route path="/admin/guidelines" element={<ProtectedRoute role="ORG_ADMIN"><GuidelinesAdmin /></ProtectedRoute>} />
 
         </Routes>
       </Layout>

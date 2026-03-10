@@ -202,7 +202,7 @@ const ActiveTrip = () => {
             <p className="text-gray-600 mb-6">{error}</p>
             <button
               onClick={() => navigate('/driver/requests')}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
             >
               Back to Trips
             </button>
@@ -327,7 +327,7 @@ const ActiveTrip = () => {
                     <button
                       onClick={handleCompleteTrip}
                       disabled={actionLoading}
-                      className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"
+                      className="w-full px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:bg-gray-400"
                     >
                       {actionLoading ? 'Completing...' : '✓ Complete Trip'}
                     </button>
@@ -337,7 +337,7 @@ const ActiveTrip = () => {
                   <div className="pt-3">
                     <button
                       onClick={() => setShowSummary(true)}
-                      className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                      className="w-full px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
                     >
                       📊 View Trip Summary
                     </button>
@@ -483,7 +483,7 @@ const ActiveTrip = () => {
                           <button
                             onClick={() => handleDropoff(ride._id)}
                             disabled={pickupLoading[ride._id]}
-                            className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors disabled:bg-gray-400 whitespace-nowrap"
+                            className="px-3 py-1 bg-emerald-600 text-white text-sm rounded hover:bg-emerald-700 transition-colors disabled:bg-gray-400 whitespace-nowrap"
                           >
                             {pickupLoading[ride._id] ? '...' : '✓ Drop Off'}
                           </button>
@@ -515,7 +515,7 @@ const ActiveTrip = () => {
             <div className="space-y-2">
               {trip.waypoints.map((waypoint, index) => (
                 <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
+                  <div className="w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
                     {waypoint.order || index + 1}
                   </div>
                   <div className="flex-1 min-w-0">

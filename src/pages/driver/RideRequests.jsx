@@ -217,7 +217,7 @@ const RideRequests = () => {
           </div>
           <button
             onClick={() => navigate('/driver/create-trip')}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
           >
             + Create New Trip
           </button>
@@ -254,7 +254,7 @@ const RideRequests = () => {
             <p className="text-gray-600 mb-6">Create your first trip to start receiving ride requests</p>
             <button
               onClick={() => navigate('/driver/create-trip')}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
             >
               Create Trip
             </button>
@@ -311,7 +311,7 @@ const RideRequests = () => {
                             e.stopPropagation();
                             navigate(`/driver/trip/${trip._id}`);
                           }}
-                          className="w-full py-2 px-3 bg-blue-600 text-white text-sm rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                          className="w-full py-2 px-3 bg-emerald-600 text-white text-sm rounded-lg font-medium hover:bg-emerald-700 transition-colors"
                         >
                           {trip.status === 'STARTED' ? '🚗 Track Trip' : '📋 Manage Trip'}
                         </button>

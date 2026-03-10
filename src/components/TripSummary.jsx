@@ -58,7 +58,7 @@ const TripSummary = ({ tripId, onClose }) => {
             <p className="text-gray-600 mb-6">{error || 'Failed to load summary'}</p>
             <button
               onClick={onClose}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
             >
               Close
             </button>
@@ -294,7 +294,7 @@ const TripSummary = ({ tripId, onClose }) => {
         <div className="bg-gray-50 px-6 py-4 rounded-b-lg border-t border-gray-200 flex justify-end space-x-3">
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium"
           >
             Close
           </button>
