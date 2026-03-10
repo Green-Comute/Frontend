@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { MapPin, Clock, User } from 'lucide-react';
 import { safetyService } from '../../services/safetyService';
+import LiveTrackingMap from '../../components/LiveTrackingMap';
 
 const STATUS_COLOR = {
     SCHEDULED: 'bg-blue-100 text-blue-700',
@@ -23,21 +24,38 @@ const PublicTripTracking = () => {
     const [error, setError] = useState('');
 
     useEffect(() => {
+        console.log('🔍 [PublicTripTracking] Fetching trip with token:', token);
         safetyService
             .trackSharedTrip(token)
-            .then((res) => setTrip(res.data ?? res))
-            .catch((err) => setError(err.message || 'Invalid or expired share link.'))
+            .then((res) => {
+                console.log('✅ [PublicTripTracking] Full API response:', res);
+                const result = res.data ?? res;
+                console.log('📦 [PublicTripTracking] Response data:', result);
+                const tripData = result.trip ?? result;
+                console.log('📊 [PublicTripTracking] Extracted trip data:', tripData);
+                console.log('📍 [PublicTripTracking] Trip ID:', tripData?._id);
+                console.log('🚗 [PublicTripTracking] Driver ID:', tripData?.driverId?._id ?? tripData?.driverId);
+                console.log('📋 [PublicTripTracking] Trip status:', tripData?.status);
+                console.log('📍 [PublicTripTracking] Source:', tripData?.source);
+                console.log('📍 [PublicTripTracking] Destination:', tripData?.destination);
+                setTrip(tripData);
+            })
+            .catch((err) => {
+                console.error('❌ [PublicTripTracking] Error fetching trip:', err);
+                setError(err.message || 'Invalid or expired share link.');
+            })
             .finally(() => setLoading(false));
     }, [token]);
 
     if (loading)
         return (
             <div className="min-h-screen flex items-center justify-center text-stone-500">
-                Loading trip…
+                ⏳ Loading trip…
             </div>
         );
 
-    if (error)
+    if (error) {
+        console.error('🔴 [PublicTripTracking] Error state:', error);
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center max-w-sm">
@@ -47,8 +65,95 @@ const PublicTripTracking = () => {
                 </div>
             </div>
         );
+    }
+
+    if (!trip) {
+        console.warn('⚠️ [PublicTripTracking] Trip not loaded yet');
+        return (
+            <div className="min-h-screen flex items-center justify-center text-stone-500">
+                ⏳ Trip data not available…
+            </div>
+        );
+    }
 
     const statusClass = STATUS_COLOR[trip.status] ?? 'bg-stone-100 text-stone-600';
+
+    if (trip && (trip.status === 'STARTED' || trip.status === 'IN_PROGRESS')) {
+        console.log('🗺️ [PublicTripTracking] Rendering live map for trip status:', trip.status);
+        return (
+            <div className="min-h-screen bg-stone-50 py-8 px-4">
+                <div className="max-w-6xl mx-auto">
+                    {/* Header */}
+                    <div className="mb-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <h1 className="text-3xl font-bold text-stone-900">Live Trip Tracking</h1>
+                                <p className="text-stone-600 mt-1">Real-time driver location (shared via GreenCommute)</p>
+                            </div>
+                            <span className={`text-sm font-semibold px-4 py-2 rounded-full ${statusClass}`}>
+                                {trip.status === 'STARTED' ? '🚗 In Progress' : '✓ Completed'}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Live Map */}
+                    <div className="mb-6">
+                        <LiveTrackingMap
+                            trip={trip}
+                            userRole="public"
+                        />
+                    </div>
+
+                    {/* Trip Info Card */}
+                    <div className="bg-white rounded-lg shadow-md p-6">
+                        <h3 className="font-semibold text-stone-900 mb-4">Trip Information</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 className="text-sm font-medium text-stone-700 mb-3">Route</h4>
+                                <div className="space-y-3">
+                                    <div className="flex items-start space-x-2">
+                                        <div className="w-3 h-3 bg-green-500 rounded-full mt-1 flex-shrink-0"></div>
+                                        <div>
+                                            <div className="text-sm text-stone-600">From</div>
+                                            <div className="font-medium text-stone-900">{trip.source}</div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start space-x-2">
+                                        <div className="w-3 h-3 bg-red-500 rounded-full mt-1 flex-shrink-0"></div>
+                                        <div>
+                                            <div className="text-sm text-stone-600">To</div>
+                                            <div className="font-medium text-stone-900">{trip.destination}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-medium text-stone-700 mb-3">Driver & Vehicle</h4>
+                                <div className="space-y-2">
+                                    <div>
+                                        <span className="text-sm text-stone-600">Driver:</span>
+                                        <p className="font-medium text-stone-900">{trip.driverId?.name || 'Unknown'}</p>
+                                    </div>
+                                    <div>
+                                        <span className="text-sm text-stone-600">Vehicle:</span>
+                                        <p className="font-medium text-stone-900">{trip.vehicleType || '—'}</p>
+                                    </div>
+                                    {trip.scheduledTime && (
+                                        <div>
+                                            <span className="text-sm text-stone-600">Scheduled:</span>
+                                            <p className="font-medium text-stone-900">
+                                                {new Date(trip.scheduledTime).toLocaleString()}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-stone-50 flex flex-col items-center justify-center p-6">

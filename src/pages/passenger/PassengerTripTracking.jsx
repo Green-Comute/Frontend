@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { rideService } from '../../services/rideService';
 import { tripService } from '../../services/tripService';
+import { safetyService } from '../../services/safetyService';
 import LiveTrackingMap from '../../components/LiveTrackingMap';
 import TripSummary from '../../components/TripSummary';
 import { io } from 'socket.io-client';
@@ -20,6 +21,9 @@ const PassengerTripTracking = () => {
   const [cancelSuccess, setCancelSuccess] = useState(false);
   const [tripCancelledAlert, setTripCancelledAlert] = useState(null);
   const [showSummary, setShowSummary] = useState(false);
+  const [shareLink, setShareLink] = useState('');
+  const [shareCopied, setShareCopied] = useState(false);
+  const [shareLoading, setShareLoading] = useState(false);
   const tripRef = useRef(null);
   const rideRef = useRef(null);
 
@@ -143,6 +147,22 @@ const PassengerTripTracking = () => {
       }
     };
   }, [ride, rideId]);
+
+  const handleShareTrip = async () => {
+    try {
+      setShareLoading(true);
+      const res = await safetyService.createShareLink(trip._id);
+      const url = res.trackingUrl ?? res.data?.trackingUrl ?? '';
+      setShareLink(url);
+      await navigator.clipboard.writeText(url);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 3000);
+    } catch (err) {
+      setError(err.message || 'Failed to generate share link');
+    } finally {
+      setShareLoading(false);
+    }
+  };
 
   const handleCancelRide = async () => {
     if (!window.confirm('Are you sure you want to cancel your ride? This action cannot be undone.')) {
@@ -438,6 +458,30 @@ const PassengerTripTracking = () => {
         {trip.status === 'STARTED' && ride.pickupStatus !== 'DROPPED_OFF' && (
           <div className="mb-6">
             <LiveTrackingMap trip={trip} userRole="passenger" />
+          </div>
+        )}
+
+        {/* Share trip link — visible while trip is active */}
+        {trip.status === 'STARTED' && ride.pickupStatus !== 'DROPPED_OFF' && (
+          <div className="bg-white rounded-lg shadow-md p-4 mb-6 flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-semibold text-gray-900 text-sm">Share your trip</p>
+                <p className="text-xs text-gray-500">Let someone track this ride in real time</p>
+              </div>
+              <button
+                onClick={handleShareTrip}
+                disabled={shareLoading}
+                className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 flex items-center gap-2"
+              >
+                {shareLoading ? 'Generating…' : shareCopied ? '✓ Copied!' : '🔗 Share Link'}
+              </button>
+            </div>
+            {shareLink && (
+              <div className="p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700 break-all select-all">
+                {shareLink}
+              </div>
+            )}
           </div>
         )}
 

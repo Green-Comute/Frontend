@@ -267,29 +267,39 @@ const LiveTrackingMap = ({ trip, userRole }) => {
 
   // ── Socket connection ──
   useEffect(() => {
+    console.log(`🔌 [LiveTrackingMap] Attempting socket connection - userRole: ${userRole}, tripId: ${trip._id}`);
     const token = localStorage.getItem('authToken');
+    console.log(`🔐 [LiveTrackingMap] Auth token present: ${!!token}`);
+    
     const newSocket = io('http://localhost:5000', { auth: { token } });
 
     newSocket.on('connect', () => {
-      console.log('✅ Connected to tracking socket');
+      console.log('✅ [LiveTrackingMap] Connected to tracking socket');
       setSocketConnected(true);
+      console.log(`📍 [LiveTrackingMap] Emitting joinTrip for tripId: ${trip._id}`);
       newSocket.emit('joinTrip', trip._id);
     });
 
     newSocket.on('disconnect', () => {
-      console.log('❌ Disconnected from tracking socket');
+      console.log('❌ [LiveTrackingMap] Disconnected from tracking socket');
       setSocketConnected(false);
     });
 
     newSocket.on('locationUpdate', (data) => {
-      if (data.tripId !== trip._id) return;
+      console.log(`📍 [LiveTrackingMap] Location update received:`, data);
+      if (data.tripId !== trip._id) {
+        console.warn(`⚠️ [LiveTrackingMap] TripId mismatch - expected ${trip._id}, got ${data.tripId}`);
+        return;
+      }
 
       const loc = { lat: data.location.lat, lng: data.location.lng };
+      console.log(`🚗 [LiveTrackingMap] Setting driver location:`, loc);
       setDriverLocation(loc);
 
       // ── ETA update from server payload (backend calculated it on each push) ──
       if (userRole === 'passenger') {
         if (data.eta) {
+          console.log(`⏱️ [LiveTrackingMap] ETA from server:`, data.eta);
           setEta(data.eta);
           setEtaLastUpdated(Date.now());
         } else {
@@ -298,6 +308,7 @@ const LiveTrackingMap = ({ trip, userRole }) => {
           if (dest) {
             calculateETA(loc, dest).then(result => {
               if (result) {
+                console.log(`⏱️ [LiveTrackingMap] ETA calculated locally:`, result);
                 setEta(result);
                 setEtaLastUpdated(Date.now());
               }

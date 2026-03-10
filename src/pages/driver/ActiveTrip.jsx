@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { tripService } from '../../services/tripService';
 import { rideService } from '../../services/rideService';
+import { safetyService } from '../../services/safetyService';
 import LiveTrackingMap from '../../components/LiveTrackingMap';
 import TripSummary from '../../components/TripSummary';
 import RoutePreview from '../../components/RoutePreview';
@@ -19,6 +20,9 @@ const ActiveTrip = () => {
   const [showSummary, setShowSummary] = useState(false);
   const [optimizedRoute, setOptimizedRoute] = useState(null);
   const [routeLoading, setRouteLoading] = useState(false);
+  const [shareLink, setShareLink] = useState('');
+  const [shareCopied, setShareCopied] = useState(false);
+  const [shareLoading, setShareLoading] = useState(false);
 
   // Get user from localStorage - try multiple keys
   const getUserData = () => {
@@ -177,6 +181,22 @@ const ActiveTrip = () => {
       setError(err.message || 'Failed to mark as dropped off');
     } finally {
       setPickupLoading(prev => ({ ...prev, [rideId]: false }));
+    }
+  };
+
+  const handleShareTrip = async () => {
+    try {
+      setShareLoading(true);
+      const res = await safetyService.createShareLink(tripId);
+      const url = res.trackingUrl ?? res.data?.trackingUrl ?? '';
+      setShareLink(url);
+      await navigator.clipboard.writeText(url);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 3000);
+    } catch (err) {
+      setError(err.message || 'Failed to generate share link');
+    } finally {
+      setShareLoading(false);
     }
   };
 
@@ -352,6 +372,22 @@ const ActiveTrip = () => {
                     >
                       {actionLoading ? 'Cancelling...' : 'Cancel Trip'}
                     </button>
+                  </div>
+                )}
+                {(trip.status === 'SCHEDULED' || trip.status === 'STARTED') && (
+                  <div className="pt-1">
+                    <button
+                      onClick={handleShareTrip}
+                      disabled={shareLoading}
+                      className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 flex items-center justify-center gap-2"
+                    >
+                      {shareLoading ? 'Generating…' : shareCopied ? '✓ Link Copied!' : '🔗 Share Trip Link'}
+                    </button>
+                    {shareLink && (
+                      <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700 break-all select-all">
+                        {shareLink}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
