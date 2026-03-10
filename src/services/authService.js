@@ -9,7 +9,7 @@
  * API Base URL
  * @constant {string}
  */
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
 
 /**
  * Safe JSON Parser

@@ -1,6 +1,6 @@
 import { startRegistration, startAuthentication } from "@simplewebauthn/browser";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
 
 /**
  * Registers a new passkey for the currently logged-in user.
