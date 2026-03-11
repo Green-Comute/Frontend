@@ -155,6 +155,6 @@ describe('InputField Component', () => {
     );
     
     const input = screen.getByRole('textbox');
-    expect(input).toHaveClass('w-full', 'px-4', 'py-3', 'border', 'rounded-lg');
+    expect(input).toHaveClass('input-field');
   });
 });

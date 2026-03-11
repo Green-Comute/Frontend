@@ -33,13 +33,16 @@ describe('FuelTypeSelect Component', () => {
     });
 
     it('should render the required asterisk when required=true', () => {
-      renderSelect({ required: true });
-      expect(screen.getByLabelText('required')).toBeInTheDocument();
+      const { container } = renderSelect({ required: true });
+      const asterisk = container.querySelector('span.text-red-500');
+      expect(asterisk).toBeInTheDocument();
+      expect(asterisk).toHaveTextContent('*');
     });
 
     it('should NOT render the required asterisk when required=false', () => {
-      renderSelect({ required: false });
-      expect(screen.queryByLabelText('required')).not.toBeInTheDocument();
+      const { container } = renderSelect({ required: false });
+      const asterisk = container.querySelector('span.text-red-500');
+      expect(asterisk).not.toBeInTheDocument();
     });
 
     it('should render the select element with aria-label "Fuel Type"', () => {
