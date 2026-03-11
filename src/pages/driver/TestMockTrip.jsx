@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import LiveTrackingMap from '../../components/LiveTrackingMap';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../../config/api.config';
 
 /**
  * Test page for debugging trip visualization with mock data
@@ -15,7 +16,7 @@ const TestMockTrip = () => {
     const fetchMockTrip = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5000/api/mock/trip');
+        const response = await fetch(`${API_BASE_URL}/mock/trip`);
         const data = await response.json();
         
         if (data.success) {

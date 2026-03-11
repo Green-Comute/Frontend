@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Gift, Award, Clock, ArrowLeft, Package, ShieldAlert } from 'lucide-react';
 import { gamificationService } from '../../services/gamificationService';
+import { ASSETS_BASE_URL } from '../../config/api.config';
 
 /**
  * Story 4.9 & 4.10 — Browse rewards and atomic redemption form
@@ -125,7 +126,7 @@ const RewardsCatalog = () => {
                             const canAfford = balance >= item.pointCost;
                             const outOfStock = item.stock !== null && item.stock <= 0;
                             const imageUrl = item.imageUrl
-                                ? (item.imageUrl.startsWith('http') ? item.imageUrl : `http://localhost:5000/${item.imageUrl}`)
+                                ? (item.imageUrl.startsWith('http') ? item.imageUrl : `${ASSETS_BASE_URL}/${item.imageUrl}`)
                                 : null;
 
                             return (

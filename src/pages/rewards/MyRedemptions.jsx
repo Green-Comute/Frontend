@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock, ArrowLeft, Image as ImageIcon, CircleCheck, CircleX, Loader2 } from 'lucide-react';
 import { gamificationService } from '../../services/gamificationService';
+import { ASSETS_BASE_URL } from '../../config/api.config';
 
 /**
  * Story 4.15 — User's redemption history
@@ -64,7 +65,7 @@ const MyRedemptions = () => {
                                     {/* Image Thumbnail */}
                                     <div className="w-16 h-16 shrink-0 bg-stone-100 rounded-lg flex items-center justify-center border overflow-hidden">
                                         {r.rewardItemId?.imageUrl ? (
-                                            <img src={`http://localhost:5000/${r.rewardItemId.imageUrl}`} alt="" className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
+                                            <img src={`${ASSETS_BASE_URL}/${r.rewardItemId.imageUrl}`} alt="" className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
                                         ) : (
                                             <ImageIcon className="w-6 h-6 text-stone-300" />
                                         )}

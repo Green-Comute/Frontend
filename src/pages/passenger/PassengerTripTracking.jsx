@@ -7,6 +7,7 @@ import LiveTrackingMap from '../../components/LiveTrackingMap';
 import TripSummary from '../../components/TripSummary';
 import { io } from 'socket.io-client';
 import calculateETA from '../../services/etaService';
+import { SOCKET_URL } from '../../config/api.config';
 
 const PassengerTripTracking = () => {
   const { rideId } = useParams();
@@ -66,7 +67,7 @@ const PassengerTripTracking = () => {
     if (!ride) return;
 
     const token = localStorage.getItem('authToken');
-    const newSocket = io('http://localhost:5000', {
+    const newSocket = io(SOCKET_URL, {
       auth: { token }
     });
 

@@ -13,6 +13,7 @@ import MapView from './MapView';
 import { io } from 'socket.io-client';
 import calculateETA from '../services/etaService';
 import { isTrafficApiConfigured } from '../services/trafficService';
+import { SOCKET_URL } from '../config/api.config';
 
 // ─── ETA display helper ──────────────────────────────────────────────────────
 const ETACard = ({ eta, lastUpdated, userRole }) => {
@@ -271,7 +272,7 @@ const LiveTrackingMap = ({ trip, userRole }) => {
     const token = localStorage.getItem('authToken');
     console.log(`🔐 [LiveTrackingMap] Auth token present: ${!!token}`);
     
-    const newSocket = io('http://localhost:5000', { auth: { token } });
+    const newSocket = io(SOCKET_URL, { auth: { token } });
 
     newSocket.on('connect', () => {
       console.log('✅ [LiveTrackingMap] Connected to tracking socket');

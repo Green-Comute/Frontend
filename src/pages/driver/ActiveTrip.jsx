@@ -7,6 +7,7 @@ import LiveTrackingMap from '../../components/LiveTrackingMap';
 import TripSummary from '../../components/TripSummary';
 import RoutePreview from '../../components/RoutePreview';
 import { io } from 'socket.io-client';
+import { SOCKET_URL } from '../../config/api.config';
 
 const ActiveTrip = () => {
   const { tripId } = useParams();
@@ -87,7 +88,7 @@ const ActiveTrip = () => {
   // Socket connection: listen for passenger cancellations
   useEffect(() => {
     const token = localStorage.getItem('authToken');
-    const socket = io('http://localhost:5000', { auth: { token } });
+    const socket = io(SOCKET_URL, { auth: { token } });
 
     socket.on('ride-cancelled-by-passenger', (data) => {
       setPassengerCancelAlert(data.message || 'A passenger has cancelled their ride.');

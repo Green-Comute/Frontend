@@ -4,6 +4,7 @@ import { tripService } from '../../services/tripService';
 import { rideService } from '../../services/rideService';
 import RideRequestCard from '../../components/RideRequestCard';
 import { io } from 'socket.io-client';
+import { SOCKET_URL } from '../../config/api.config';
 
 const RideRequests = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const RideRequests = () => {
   // Setup socket once — never reconnect just because selectedTrip changed
   useEffect(() => {
     const token = localStorage.getItem('authToken');
-    const socket = io('http://localhost:5000', {
+    const socket = io(SOCKET_URL, {
       auth: { token }
     });
 

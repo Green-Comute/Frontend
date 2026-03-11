@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import { ASSETS_BASE_URL } from '../config/api.config';
 
 const AdminDriverRequests = () => {
   const [drivers, setDrivers] = useState([]);
   const [reasons, setReasons] = useState({}); // 🔹 per-driver reason
 
   useEffect(() => {
-    fetch("http://localhost:5000/org-admin/driver-requests", {
+    fetch(`${ASSETS_BASE_URL}/org-admin/driver-requests`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("authToken")}`,
       },
@@ -16,7 +17,7 @@ const AdminDriverRequests = () => {
 
   const review = async (id, action) => {
     await fetch(
-      `http://localhost:5000/org-admin/driver-requests/${id}/${action}`,
+      `${ASSETS_BASE_URL}/org-admin/driver-requests/${id}/${action}`,
       {
         method: "POST",
         headers: {
@@ -61,7 +62,7 @@ const AdminDriverRequests = () => {
           <div className="flex gap-4 mb-4">
             {d.driverDocuments?.license && (
               <a
-                href={`http://localhost:5000/${d.driverDocuments.license}`}
+                href={`${ASSETS_BASE_URL}/${d.driverDocuments.license}`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-emerald-600 underline"
@@ -72,7 +73,7 @@ const AdminDriverRequests = () => {
 
             {d.driverDocuments?.rc && (
               <a
-                href={`http://localhost:5000/${d.driverDocuments.rc}`}
+                href={`${ASSETS_BASE_URL}/${d.driverDocuments.rc}`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-emerald-600 underline"

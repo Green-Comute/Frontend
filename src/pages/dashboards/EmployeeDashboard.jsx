@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { rideService } from "../../services/rideService";
 import { io } from 'socket.io-client';
 import { registerPasskey } from "../../services/passkeyService";
+import { API_BASE_URL, SOCKET_URL } from '../../config/api.config';
 
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const EmployeeDashboard = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/users/me", {
+        const res = await fetch(`${API_BASE_URL}/users/me`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
@@ -63,7 +64,7 @@ const EmployeeDashboard = () => {
     if (!user) return;
 
     const token = localStorage.getItem('authToken');
-    const socket = io('http://localhost:5000', {
+    const socket = io(SOCKET_URL, {
       auth: { token }
     });
 
@@ -109,7 +110,7 @@ const EmployeeDashboard = () => {
 
     try {
       const res = await fetch(
-        "http://localhost:5000/api/users/driver-intent",
+        `${API_BASE_URL}/users/driver-intent`,
         {
           method: "POST",
           headers: {

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Leaf, Shield, Mail } from "lucide-react";
 import InputField from "../components/InputField";
 import { authService } from "../services/authService";
+import { ASSETS_BASE_URL } from '../config/api.config';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -64,7 +65,7 @@ const Signup = () => {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:5000/auth/send-otp", {
+      const res = await fetch(`${ASSETS_BASE_URL}/auth/send-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { Star, ChevronRight, ArrowLeft } from 'lucide-react';
 import { gamificationService } from '../../services/gamificationService';
+import { SOCKET_URL } from '../../config/api.config';
 
 /**
  * Stories 4.5 + 4.6 — Tier progress bar + real-time tier-upgrade notification
@@ -29,7 +30,7 @@ const TierProgress = () => {
 
         // 4.6 — Listen for instant tier-upgrade socket event
         const token = localStorage.getItem('authToken');
-        const socket = io('http://localhost:5000', { auth: { token } });
+        const socket = io(SOCKET_URL, { auth: { token } });
 
         socket.on('tier-upgrade', (payload) => {
             setToast(payload.message);

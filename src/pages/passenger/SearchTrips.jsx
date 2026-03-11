@@ -5,6 +5,7 @@ import TripCard from '../../components/TripCard';
 import LocationAutocomplete from '../../components/LocationAutocomplete';
 import MapView from '../../components/MapView';
 import { io } from 'socket.io-client';
+import { SOCKET_URL } from '../../config/api.config';
 
 const SearchTrips = () => {
   const [searchParams, setSearchParams] = useState({
@@ -33,7 +34,7 @@ const SearchTrips = () => {
     if (!hasSearched) return;
 
     const token = localStorage.getItem('authToken');
-    const socket = io('http://localhost:5000', {
+    const socket = io(SOCKET_URL, {
       auth: { token }
     });
 

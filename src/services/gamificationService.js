@@ -6,7 +6,8 @@ const getHeaders = () => ({
 });
 
 const adminRequest = async (endpoint, options = {}) => {
-    const base = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+    import { ASSETS_BASE_URL } from '../config/api.config';
+    const base = ASSETS_BASE_URL;
     const res = await fetch(`${base}${endpoint}`, { ...options, headers: getHeaders() });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'API request failed');

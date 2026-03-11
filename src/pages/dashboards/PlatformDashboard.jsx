@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Building2, UserPlus, Shield, Globe, Car, FileWarning } from "lucide-react";
 import { registerPasskey } from "../../services/passkeyService";
+import { ASSETS_BASE_URL } from '../../config/api.config';
 
 const PlatformDashboard = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const PlatformDashboard = () => {
   useEffect(() => {
     const fetchOrgs = async () => {
       try {
-        const res = await fetch("http://localhost:5000/platform/organizations", {
+        const res = await fetch(`${ASSETS_BASE_URL}/platform/organizations`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
@@ -39,7 +40,7 @@ const PlatformDashboard = () => {
 
   const handleCreateOrg = async () => {
     try {
-      const res = await fetch("http://localhost:5000/platform/organizations", {
+      const res = await fetch(`${ASSETS_BASE_URL}/platform/organizations`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -61,7 +62,7 @@ const PlatformDashboard = () => {
 
   const handleCreateOrgAdmin = async () => {
     try {
-      const res = await fetch("http://localhost:5000/platform/org-admins", {
+      const res = await fetch(`${ASSETS_BASE_URL}/platform/org-admins`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

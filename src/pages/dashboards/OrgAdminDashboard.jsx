@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Users, CheckCircle, Car, Trash2, UserX, Eye, FileWarning } from "lucide-react";
 import { registerPasskey } from "../../services/passkeyService";
+import { ASSETS_BASE_URL } from '../../config/api.config';
 
 const OrgAdminDashboard = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const OrgAdminDashboard = () => {
     const fetchPendingUsers = async () => {
       try {
         const res = await fetch(
-          "http://localhost:5000/org-admin/pending-users",
+          `${ASSETS_BASE_URL}/org-admin/pending-users`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -47,7 +48,7 @@ const OrgAdminDashboard = () => {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const res = await fetch("http://localhost:5000/org-admin/members", {
+        const res = await fetch(`${ASSETS_BASE_URL}/org-admin/members`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
@@ -71,7 +72,7 @@ const OrgAdminDashboard = () => {
   const approveUser = async (userId) => {
     try {
       const res = await fetch(
-        "http://localhost:5000/org-admin/approve-user",
+        `${ASSETS_BASE_URL}/org-admin/approve-user`,
         {
           method: "POST",
           headers: {
@@ -108,7 +109,7 @@ const OrgAdminDashboard = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/org-admin/remove-user/${userId}`,
+        `${ASSETS_BASE_URL}/org-admin/remove-user/${userId}`,
         {
           method: "DELETE",
           headers: {

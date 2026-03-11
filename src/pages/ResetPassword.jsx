@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { ASSETS_BASE_URL } from '../config/api.config';
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -11,7 +12,7 @@ const ResetPassword = () => {
     e.preventDefault();
 
     const res = await fetch(
-      `http://localhost:5000/auth/reset-password/${token}`,
+      `${ASSETS_BASE_URL}/auth/reset-password/${token}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
