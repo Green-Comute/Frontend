@@ -1,6 +1,7 @@
 import { startRegistration, startAuthentication } from "@simplewebauthn/browser";
 
-const API_BASE = "http://localhost:5000";
+import { ASSETS_BASE_URL } from '../config/api.config';
+const API_BASE = ASSETS_BASE_URL;
 
 /**
  * Registers a new passkey for the currently logged-in user.

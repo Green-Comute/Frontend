@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Gift, Award, Clock, ArrowLeft, Package, ShieldAlert } from 'lucide-react';
 import { gamificationService } from '../../services/gamificationService';
+import { ASSETS_BASE_URL } from '../../config/api.config';
 
 /**
  * Story 4.9 & 4.10 — Browse rewards and atomic redemption form
@@ -57,7 +58,7 @@ const RewardsCatalog = () => {
     };
 
     return (
-        <div className="min-h-screen bg-stone-50 p-6 md:p-8">
+        <div className="min-h-screen bg-stone-50 p-6 md:p-8 animate-fade-in">
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -112,7 +113,7 @@ const RewardsCatalog = () => {
 
                 {/* Catalog Grid */}
                 {loading ? (
-                    <div className="p-12 text-center text-stone-500">Loading rewards catalog...</div>
+                    <div className="p-12 text-center text-stone-500"><div className="spinner mx-auto"></div><p className="mt-4">Loading rewards catalog...</p></div>
                 ) : items.length === 0 ? (
                     <div className="bg-white rounded-xl border shadow-sm p-12 text-center">
                         <Package className="w-12 h-12 text-stone-300 mx-auto mb-3" />
@@ -125,7 +126,7 @@ const RewardsCatalog = () => {
                             const canAfford = balance >= item.pointCost;
                             const outOfStock = item.stock !== null && item.stock <= 0;
                             const imageUrl = item.imageUrl
-                                ? (item.imageUrl.startsWith('http') ? item.imageUrl : `http://localhost:5000/${item.imageUrl}`)
+                                ? (item.imageUrl.startsWith('http') ? item.imageUrl : `${ASSETS_BASE_URL}/${item.imageUrl}`)
                                 : null;
 
                             return (

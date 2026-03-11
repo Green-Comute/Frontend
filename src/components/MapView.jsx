@@ -206,7 +206,7 @@ const MapView = ({
   }
 
   return (
-    <div className={`rounded-lg overflow-hidden shadow-md ${className}`} style={{ height }}>
+    <div className={`rounded-lg overflow-hidden shadow-md ${className}`} style={{ height, isolation: 'isolate' }}>
       <MapContainer
         center={center}
         zoom={zoom}

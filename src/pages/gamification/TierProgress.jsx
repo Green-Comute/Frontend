@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { Star, ChevronRight, ArrowLeft } from 'lucide-react';
 import { gamificationService } from '../../services/gamificationService';
+import { SOCKET_URL } from '../../config/api.config';
 
 /**
  * Stories 4.5 + 4.6 — Tier progress bar + real-time tier-upgrade notification
@@ -29,7 +30,7 @@ const TierProgress = () => {
 
         // 4.6 — Listen for instant tier-upgrade socket event
         const token = localStorage.getItem('authToken');
-        const socket = io('http://localhost:5000', { auth: { token } });
+        const socket = io(SOCKET_URL, { auth: { token } });
 
         socket.on('tier-upgrade', (payload) => {
             setToast(payload.message);
@@ -41,7 +42,7 @@ const TierProgress = () => {
     }, []);
 
     if (loading) {
-        return <div className="p-8 text-stone-500">Loading tier progress...</div>;
+        return <div className="min-h-screen bg-stone-50 flex items-center justify-center"><div className="spinner"></div></div>;
     }
 
     if (!data) {
@@ -59,7 +60,7 @@ const TierProgress = () => {
     const barColor = tierColors[currentTier?.name] || 'bg-emerald-600';
 
     return (
-        <div className="min-h-screen bg-stone-50 p-6 md:p-8">
+        <div className="min-h-screen bg-stone-50 p-6 md:p-8 animate-fade-in">
             <div className="max-w-2xl mx-auto">
                 {/* Toast notification (4.6) */}
                 {toast && (
@@ -70,7 +71,7 @@ const TierProgress = () => {
 
                 <button
                     onClick={() => navigate('/dashboard')}
-                    className="flex items-center gap-2 text-stone-500 hover:text-stone-700 mb-6 transition"
+                    className="btn-secondary mb-6"
                 >
                     <ArrowLeft className="w-4 h-4" /> Back to Dashboard
                 </button>
@@ -81,7 +82,7 @@ const TierProgress = () => {
                 </div>
 
                 {/* Current tier badge */}
-                <div className="bg-white rounded-2xl border shadow-sm p-8 mb-6">
+                <div className="card p-8 mb-6">
                     <div className="flex items-center justify-between mb-2">
                         <span className="text-4xl">{currentTier?.icon || '🥉'}</span>
                         <span
@@ -131,7 +132,7 @@ const TierProgress = () => {
                 </div>
 
                 {/* All tiers ladder */}
-                <div className="bg-white rounded-xl border shadow-sm p-6">
+                <div className="card p-6">
                     <h2 className="font-semibold text-stone-700 mb-4">All Tiers</h2>
                     <div className="space-y-3">
                         {allTiers.map((tier) => (

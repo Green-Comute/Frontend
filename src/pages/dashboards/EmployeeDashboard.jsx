@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { rideService } from "../../services/rideService";
 import { io } from 'socket.io-client';
 import { registerPasskey } from "../../services/passkeyService";
+import { API_BASE_URL, SOCKET_URL } from '../../config/api.config';
 
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const EmployeeDashboard = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/users/me", {
+        const res = await fetch(`${API_BASE_URL}/users/me`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
@@ -63,7 +64,7 @@ const EmployeeDashboard = () => {
     if (!user) return;
 
     const token = localStorage.getItem('authToken');
-    const socket = io('http://localhost:5000', {
+    const socket = io(SOCKET_URL, {
       auth: { token }
     });
 
@@ -109,7 +110,7 @@ const EmployeeDashboard = () => {
 
     try {
       const res = await fetch(
-        "http://localhost:5000/api/users/driver-intent",
+        `${API_BASE_URL}/users/driver-intent`,
         {
           method: "POST",
           headers: {
@@ -148,68 +149,96 @@ const EmployeeDashboard = () => {
   };
 
   if (loading) {
-    return <p className="p-8">Loading dashboard...</p>;
+    return (
+      <div className="page-container animate-fade-in">
+        <div className="skeleton h-8 w-64 mb-3"></div>
+        <div className="skeleton h-4 w-96 mb-8"></div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="card p-6 space-y-3">
+              <div className="skeleton h-5 w-36"></div>
+              <div className="skeleton h-3 w-48"></div>
+              <div className="skeleton h-3 w-40"></div>
+              <div className="skeleton h-9 w-full mt-2"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
-  // 🛡️ Safety guard
+  // Safety guard
   if (!user) {
-    return <p className="p-8 text-red-600">Failed to load user</p>;
+    return (
+      <div className="page-container">
+        <div className="empty-state">
+          <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
+            <svg className="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
+          </div>
+          <p className="text-stone-600 font-medium">Failed to load user data</p>
+          <p className="text-sm text-stone-500 mt-1">Please try refreshing the page</p>
+        </div>
+      </div>  
+    );
   }
 
   return (
-    <div className="p-8">
+    <div className="page-container animate-fade-in">
       {tripNotification && (
-        <div className="mb-6 p-4 bg-amber-50 border border-amber-300 rounded-lg flex items-start space-x-3">
-          <span className="text-amber-500 text-xl">ℹ️</span>
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3" role="alert">
+          <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg className="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/></svg>
+          </div>
           <div>
-            <p className="font-semibold text-amber-800">Trip Update</p>
-            <p className="text-amber-700 text-sm mt-1">{tripNotification}</p>
+            <p className="font-semibold text-amber-800 text-sm">Trip Update</p>
+            <p className="text-amber-700 text-sm mt-0.5">{tripNotification}</p>
           </div>
         </div>
       )}
 
-      <h1 className="text-3xl font-bold text-stone-900 mb-2">
-        Welcome to GreenCommute 🌱
-      </h1>
+      <div className="mb-8">
+        <h1 className="section-title text-2xl sm:text-3xl">
+          Welcome to GreenCommute
+        </h1>
+        <p className="section-subtitle text-sm sm:text-base">
+          Start sharing rides with colleagues from your organization.
+        </p>
+      </div>
 
-      <p className="text-stone-600 mb-8">
-        Start sharing rides with colleagues from your organization.
-      </p>
-
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {/* Personal Details */}
-        <div className="p-6 bg-white border rounded-xl shadow-sm">
-          <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-            👤 Personal Details
+        <div className="card p-5">
+          <h3 className="font-semibold text-base mb-4 text-stone-900">
+            Personal Details
           </h3>
-          <div className="space-y-2 text-sm">
+          <div className="space-y-2.5 text-sm">
             <div className="flex justify-between">
-              <span className="text-stone-600">Name:</span>
-              <span className="font-medium">{user.name}</span>
+              <span className="text-stone-500">Name</span>
+              <span className="font-medium text-stone-900">{user.name}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-stone-600">Email:</span>
-              <span className="font-medium text-xs">{user.email}</span>
+              <span className="text-stone-500">Email</span>
+              <span className="font-medium text-stone-900 text-xs">{user.email}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-stone-600">Role:</span>
-              <span className="font-medium capitalize">{user.role}</span>
+              <span className="text-stone-500">Role</span>
+              <span className="font-medium capitalize text-stone-900">{user.role}</span>
             </div>
             {user.phone && (
               <div className="flex justify-between">
-                <span className="text-stone-600">Phone:</span>
+                <span className="text-stone-500">Phone</span>
                 <span className="font-medium">{user.phone}</span>
               </div>
             )}
             {user.organizationId && (
               <div className="flex justify-between">
-                <span className="text-stone-600">Organization:</span>
+                <span className="text-stone-500">Organization</span>
                 <span className="font-medium text-xs">{user.organizationId}</span>
               </div>
             )}
-            <div className="pt-2 border-t">
+            <div className="pt-2 border-t border-stone-100">
               <div className="flex justify-between items-center">
-                <span className="text-stone-600">Profile:</span>
+                <span className="text-stone-500">Profile</span>
                 <span className={`text-xs px-2 py-1 rounded ${user.profileCompleted
                   ? "bg-green-100 text-green-700"
                   : "bg-amber-100 text-amber-700"
@@ -230,7 +259,7 @@ const EmployeeDashboard = () => {
                 </ul>
                 <button
                   onClick={() => navigate("/complete-profile")}
-                  className="mt-3 w-full px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 text-sm transition-colors"
+                  className="btn-primary w-full text-sm py-2 mt-3"
                 >
                   Complete Profile
                 </button>
@@ -238,7 +267,7 @@ const EmployeeDashboard = () => {
             )}
             {user.isDriver && (
               <div className="flex justify-between items-center">
-                <span className="text-stone-600">Driver Status:</span>
+                <span className="text-stone-500">Driver Status</span>
                 <span className={`text-xs px-2 py-1 rounded ${user.driverStatus === "APPROVED"
                   ? "bg-green-100 text-green-700"
                   : user.driverStatus === "PENDING"
@@ -253,36 +282,36 @@ const EmployeeDashboard = () => {
         </div>
 
         {/* Find Rides */}
-        <div className="p-6 bg-white border rounded-xl shadow-sm">
-          <h3 className="font-semibold text-lg mb-2">🔍 Find Rides</h3>
-          <p className="text-sm text-stone-600 mb-4">
+        <div className="card p-5">
+          <h3 className="font-semibold text-base mb-2 text-stone-900">Find Rides</h3>
+          <p className="text-sm text-stone-500 mb-4">
             Search and book rides with colleagues along your route.
           </p>
           <button
             onClick={() => navigate("/passenger/search")}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full"
+            className="btn-primary w-full text-sm"
           >
             Search Available Trips
           </button>
         </div>
 
         {/* Offer Ride */}
-        <div className="p-6 bg-white border rounded-xl shadow-sm">
-          <h3 className="font-semibold text-lg mb-2">🚗 Offer a Ride</h3>
-          <p className="text-sm text-stone-600 mb-4">
+        <div className="card p-5">
+          <h3 className="font-semibold text-base mb-2 text-stone-900">Offer a Ride</h3>
+          <p className="text-sm text-stone-500 mb-4">
             Create trips and share your commute to save emissions.
           </p>
           {user.driverStatus === "APPROVED" ? (
             <div className="space-y-2">
               <button
                 onClick={() => navigate("/driver/create-trip")}
-                className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors w-full"
+                className="btn-primary w-full text-sm"
               >
                 Create New Trip
               </button>
               <button
                 onClick={() => navigate("/driver/requests")}
-                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors w-full"
+                className="btn-secondary w-full text-sm"
               >
                 Manage Requests
               </button>
@@ -296,23 +325,23 @@ const EmployeeDashboard = () => {
           )}
         </div>
 
-        {/* 🌱 Green Impact */}
-        <div className="p-6 bg-white border border-emerald-200 rounded-xl shadow-sm">
-          <h3 className="font-semibold text-lg mb-2">🌱 My Green Impact</h3>
-          <p className="text-sm text-stone-600 mb-4">
+        {/* Green Impact */}
+        <div className="card p-5 border-emerald-200">
+          <h3 className="font-semibold text-base mb-2 text-stone-900">My Green Impact</h3>
+          <p className="text-sm text-stone-500 mb-4">
             Track your CO₂ savings, trees equivalent, and sustainability stats.
           </p>
           <button
             onClick={() => navigate("/impact/my")}
-            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors w-full"
+            className="btn-primary w-full text-sm"
           >
             View My Impact
           </button>
         </div>
 
-        {/* 🚗 Driver Card */}
-        <div className="p-6 bg-white border rounded-xl shadow-sm">
-          <h3 className="font-semibold text-lg mb-2">Become a Driver</h3>
+        {/* Driver Card */}
+        <div className="card p-5">
+          <h3 className="font-semibold text-base mb-2 text-stone-900">Become a Driver</h3>
 
           {/* NOT A DRIVER */}
           {!user.isDriver && (
@@ -323,7 +352,7 @@ const EmployeeDashboard = () => {
               <button
                 onClick={requestDriver}
                 disabled={actionLoading}
-                className="px-4 py-2 bg-emerald-600 text-white rounded-lg"
+                className="btn-primary text-sm"
               >
                 {actionLoading ? "Submitting..." : "Request Driver Access"}
               </button>
@@ -338,7 +367,7 @@ const EmployeeDashboard = () => {
               </p>
               <button
                 onClick={() => navigate("/driver/upload")}
-                className="px-4 py-2 bg-emerald-600 text-white rounded-lg"
+                className="btn-primary text-sm"
               >
                 Upload Driver Documents
               </button>
@@ -371,16 +400,16 @@ const EmployeeDashboard = () => {
           )}
         </div>
 
-        {/* 🔑 Security / Passkey */}
-        <div className="p-6 bg-white border rounded-xl shadow-sm">
-          <h3 className="font-semibold text-lg mb-2">🔑 Security</h3>
-          <p className="text-sm text-stone-600 mb-4">
+        {/* Security / Passkey */}
+        <div className="card p-5">
+          <h3 className="font-semibold text-base mb-2 text-stone-900">Security</h3>
+          <p className="text-sm text-stone-500 mb-4">
             Register a passkey (Touch ID / Face ID) so you can sign in without a password next time.
           </p>
           <button
             onClick={handleRegisterPasskey}
             disabled={passkeyStatus === "loading"}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+            className="btn-primary text-sm"
           >
             {passkeyStatus === "loading" ? "Registering..." : "Register a Passkey"}
           </button>
@@ -394,36 +423,55 @@ const EmployeeDashboard = () => {
       </div>
 
       {/* My Rides Section */}
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold text-stone-900 mb-4 flex items-center gap-2">
-          🚕 My Rides as Passenger
+      <section className="mt-10">
+        <h2 className="section-title text-xl sm:text-2xl">
+          My Rides as Passenger
         </h2>
+        <p className="section-subtitle text-sm">Your ride requests and status</p>
 
         {ridesLoading ? (
-          <p className="text-stone-600">Loading your rides...</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="card p-5 space-y-3">
+                <div className="flex justify-between">
+                  <div className="skeleton h-5 w-20"></div>
+                  <div className="skeleton h-4 w-16"></div>
+                </div>
+                <div className="skeleton h-3 w-full"></div>
+                <div className="skeleton h-3 w-3/4"></div>
+                <div className="skeleton h-9 w-full mt-2"></div>
+              </div>
+            ))}
+          </div>
         ) : passengerRides.length === 0 ? (
-          <div className="bg-white border rounded-xl shadow-sm p-6 text-center">
-            <p className="text-stone-600">You haven&apos;t requested any rides yet.</p>
-            <button
-              onClick={() => navigate("/passenger/search")}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Find Your First Ride
-            </button>
+          <div className="card p-8">
+            <div className="empty-state">
+              <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center mb-3">
+                <svg className="w-6 h-6 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+              </div>
+              <p className="text-stone-600 font-medium">No rides yet</p>
+              <p className="text-sm text-stone-500 mt-1 mb-4">Search for trips from colleagues heading your way</p>
+              <button
+                onClick={() => navigate("/passenger/search")}
+                className="btn-primary text-sm"
+              >
+                Find Your First Ride
+              </button>
+            </div>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {passengerRides.map((ride) => (
-              <div
+              <article
                 key={ride._id}
-                className="bg-white border rounded-xl shadow-sm p-5 hover:shadow-md transition-shadow"
+                className="card p-5"
               >
                 <div className="flex justify-between items-start mb-3">
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${ride.status === "APPROVED"
-                    ? "bg-green-100 text-green-700"
+                  <span className={`badge ${ride.status === "APPROVED"
+                    ? "badge-success"
                     : ride.status === "REJECTED"
-                      ? "bg-red-100 text-red-700"
-                      : "bg-amber-100 text-amber-700"
+                      ? "badge-danger"
+                      : "badge-warning"
                     }`}>
                     {ride.status}
                   </span>
@@ -474,17 +522,17 @@ const EmployeeDashboard = () => {
                   <div className="mt-3">
                     <button
                       onClick={() => navigate(`/passenger/ride/${ride._id}`)}
-                      className="w-full px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition-colors"
+                      className="btn-primary w-full text-sm py-2"
                     >
-                      {ride.tripId.status === 'STARTED' ? '🚗 Track Live' : '📍 View Details'}
+                      {ride.tripId.status === 'STARTED' ? 'Track Live' : 'View Details'}
                     </button>
                   </div>
                 )}
-              </div>
+              </article>
             ))}
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 };

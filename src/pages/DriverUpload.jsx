@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ASSETS_BASE_URL } from '../config/api.config';
 
 const DriverUpload = () => {
   const [license, setLicense] = useState(null);
@@ -22,7 +23,7 @@ const DriverUpload = () => {
     setLoading(true);
 
     const res = await fetch(
-      "http://localhost:5000/driver/upload-documents",
+      `${ASSETS_BASE_URL}/driver/upload-documents`,
       {
         method: "POST",
         headers: {

@@ -9,7 +9,7 @@
  * API Base URL
  * @constant {string}
  */
-const API_BASE_URL = "http://localhost:5000";
+import { ASSETS_BASE_URL as API_BASE_URL } from '../config/api.config';
 
 /**
  * Safe JSON Parser

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import PropTypes from 'prop-types';
 import MapView from './MapView';
+import { API_BASE_URL, SOCKET_URL } from '../config/api.config';
 
 const LiveTripTracking = ({ tripId, userRole }) => {
   const [tripData, setTripData] = useState(null);
@@ -15,7 +16,7 @@ const LiveTripTracking = ({ tripId, userRole }) => {
   useEffect(() => {
     const fetchTripDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/trips/${tripId}`, {
+        const response = await fetch(`${API_BASE_URL}/trips/${tripId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('authToken')}`,
           },
@@ -48,7 +49,7 @@ const LiveTripTracking = ({ tripId, userRole }) => {
   // Setup Socket.IO for real-time updates
   useEffect(() => {
     const token = localStorage.getItem('authToken');
-    socketRef.current = io('http://localhost:5000', {
+    socketRef.current = io(SOCKET_URL, {
       auth: { token }
     });
 
@@ -129,7 +130,7 @@ const LiveTripTracking = ({ tripId, userRole }) => {
 
   const startTrip = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/trips/${tripId}/start`, {
+      const response = await fetch(`${API_BASE_URL}/trips/${tripId}/start`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`,
@@ -147,7 +148,7 @@ const LiveTripTracking = ({ tripId, userRole }) => {
 
   const endTrip = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/trips/${tripId}/end`, {
+      const response = await fetch(`${API_BASE_URL}/trips/${tripId}/end`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`,

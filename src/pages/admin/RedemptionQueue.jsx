@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { Inbox, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { gamificationService } from '../../services/gamificationService';
+import { SOCKET_URL, ASSETS_BASE_URL } from '../../config/api.config';
 
 /**
  * Story 4.12 — ORG_ADMIN: Redemption Queue
@@ -29,7 +30,7 @@ const RedemptionQueue = () => {
 
         // Listen for new redemptions real-time
         const token = localStorage.getItem('authToken');
-        const socket = io('http://localhost:5000', { auth: { token } });
+        const socket = io(SOCKET_URL, { auth: { token } });
 
         socket.on('redemption-submitted', () => {
             loadQueue(); // Refresh queue when a new submission arrives
@@ -62,7 +63,7 @@ const RedemptionQueue = () => {
     };
 
     return (
-        <div className="p-6 md:p-8 bg-stone-50 min-h-screen">
+        <div className="p-6 md:p-8 bg-stone-50 min-h-screen animate-fade-in">
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center gap-3 mb-8">
                     <div className="w-10 h-10 bg-amber-600 rounded-lg flex items-center justify-center shadow-sm">
@@ -97,7 +98,7 @@ const RedemptionQueue = () => {
 
                                         <div className="p-3 bg-stone-50 border rounded-lg flex items-start sm:items-center gap-4">
                                             {r.rewardItemId?.imageUrl ? (
-                                                <img src={`http://localhost:5000/${r.rewardItemId.imageUrl}`} className="w-12 h-12 rounded object-cover border" alt="" />
+                                                <img src={`${ASSETS_BASE_URL}/${r.rewardItemId.imageUrl}`} className="w-12 h-12 rounded object-cover border" alt="" />
                                             ) : <div className="w-12 h-12 rounded bg-stone-200" />}
 
                                             <div>

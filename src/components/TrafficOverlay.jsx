@@ -277,4 +277,5 @@ TrafficOverlay.propTypes = {
 };
 
 export default TrafficOverlay;
+// eslint-disable-next-line react-refresh/only-export-components
 export { IncidentMarkers, IncidentFetcher, createIncidentIcon };

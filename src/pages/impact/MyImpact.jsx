@@ -69,9 +69,9 @@ const MyImpact = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
+          <div className="spinner mx-auto" style={{ width: 48, height: 48 }}></div>
           <p className="mt-4 text-stone-600">Loading your impact data...</p>
         </div>
       </div>
@@ -80,14 +80,14 @@ const MyImpact = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-xl shadow-md p-8 text-center max-w-md">
-          <div className="text-red-500 text-4xl mb-4">⚠️</div>
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+        <div className="card p-8 text-center max-w-md">
+          <svg className="w-12 h-12 text-red-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           <h2 className="text-xl font-bold text-stone-900 mb-2">Failed to Load</h2>
           <p className="text-stone-600 mb-6">{error}</p>
           <button
             onClick={() => navigate('/dashboard')}
-            className="px-5 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+            className="btn-primary"
           >
             Back to Dashboard
           </button>
@@ -109,18 +109,18 @@ const MyImpact = () => {
   const hasAnyActivity = hasDriverActivity || hasPassengerActivity;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen bg-stone-50 py-8 px-4">
+      <div className="max-w-5xl mx-auto animate-fade-in">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-stone-900">🌱 My Environmental Impact</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight">My Environmental Impact</h1>
             <p className="text-stone-500 mt-1">Your lifetime CO₂ savings across all commutes</p>
           </div>
           <button
             onClick={() => navigate('/dashboard')}
-            className="px-4 py-2 bg-stone-100 text-stone-700 rounded-lg hover:bg-stone-200 transition-colors text-sm"
+            className="btn-secondary text-sm"
           >
             ← Back
           </button>
@@ -137,9 +137,9 @@ const MyImpact = () => {
 
         {/* Combined summary banner */}
         {hasAnyActivity && (
-          <div className="bg-gradient-to-r from-emerald-700 to-green-600 rounded-2xl p-6 mb-8 text-white shadow-lg">
+          <div className="bg-gradient-to-r from-emerald-700 to-emerald-600 rounded-2xl p-6 mb-8 text-white shadow-lg">
             <h2 className="text-base font-semibold opacity-80 mb-3">Combined Lifetime Impact</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div>
                 <p className="text-2xl font-bold">{fmt(totalCo2, 2)} kg</p>
                 <p className="text-xs opacity-75 mt-0.5">Total CO₂ Saved</p>
@@ -172,14 +172,14 @@ const MyImpact = () => {
             <p className="text-stone-400 text-sm px-2">You haven&apos;t completed any trips as a driver yet.</p>
           ) : (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
-                <StatCard icon="🗺️" label="Trips Offered" value={driver?.totalTrips} color="border-blue-400" />
-                <StatCard icon="📍" label="Distance Driven" value={fmt(driver?.totalDistanceKm, 1)} unit="km" color="border-indigo-400" />
-                <StatCard icon="🌿" label="CO₂ Saved" value={fmt(driver?.totalCo2SavedKg, 3)} unit="kg" color="border-emerald-400" />
-                <StatCard icon="🌳" label="Trees Equivalent" value={fmt(driver?.totalTreesEquivalent, 3)} color="border-green-400" />
-                <StatCard icon="⛽" label="Fuel Cost Saved" value={`₹${fmt(driver?.totalFuelCostSavingsINR, 0)}`} color="border-yellow-400" />
-                <StatCard icon="🔧" label="Maintenance Saved" value={`₹${fmt(driver?.totalMaintenanceSavingsINR, 0)}`} color="border-orange-400" />
-                <StatCard icon="🤝" label="Carpool CO₂ Bonus" value={fmt(driver?.totalCarpoolSavingsKg, 3)} unit="kg" color="border-teal-400" />
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+                <StatCard icon="" label="Trips Offered" value={driver?.totalTrips} color="border-blue-400" />
+                <StatCard icon="" label="Distance Driven" value={fmt(driver?.totalDistanceKm, 1)} unit="km" color="border-indigo-400" />
+                <StatCard icon="" label="CO₂ Saved" value={fmt(driver?.totalCo2SavedKg, 3)} unit="kg" color="border-emerald-400" />
+                <StatCard icon="" label="Trees Equivalent" value={fmt(driver?.totalTreesEquivalent, 3)} color="border-green-400" />
+                <StatCard icon="" label="Fuel Cost Saved" value={`₹${fmt(driver?.totalFuelCostSavingsINR, 0)}`} color="border-yellow-400" />
+                <StatCard icon="" label="Maintenance Saved" value={`₹${fmt(driver?.totalMaintenanceSavingsINR, 0)}`} color="border-orange-400" />
+                <StatCard icon="" label="Carpool CO₂ Bonus" value={fmt(driver?.totalCarpoolSavingsKg, 3)} unit="kg" color="border-teal-400" />
               </div>
 
               {/* Top Commute Partners */}
@@ -229,12 +229,12 @@ const MyImpact = () => {
           {!hasPassengerActivity ? (
             <p className="text-stone-400 text-sm px-2">You haven&apos;t completed any rides as a passenger yet.</p>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              <StatCard icon="🎫" label="Rides Taken" value={passenger?.totalRides} color="border-emerald-400" />
-              <StatCard icon="📍" label="Distance as Passenger" value={fmt(passenger?.totalDistanceKm, 1)} unit="km" color="border-green-400" />
-              <StatCard icon="🌿" label="CO₂ Avoided vs Solo" value={fmt(passenger?.totalCo2SavedKg, 3)} unit="kg" color="border-teal-400" />
-              <StatCard icon="🌳" label="Trees Equivalent" value={fmt(passenger?.totalTreesEquivalent, 3)} color="border-lime-500" />
-              <StatCard icon="⛽" label="Fuel Cost Avoided" value={`₹${fmt(passenger?.totalFuelCostSavingsINR, 0)}`} color="border-yellow-400" />
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              <StatCard icon="" label="Rides Taken" value={passenger?.totalRides} color="border-emerald-400" />
+              <StatCard icon="" label="Distance as Passenger" value={fmt(passenger?.totalDistanceKm, 1)} unit="km" color="border-green-400" />
+              <StatCard icon="" label="CO₂ Avoided vs Solo" value={fmt(passenger?.totalCo2SavedKg, 3)} unit="kg" color="border-teal-400" />
+              <StatCard icon="" label="Trees Equivalent" value={fmt(passenger?.totalTreesEquivalent, 3)} color="border-lime-500" />
+              <StatCard icon="" label="Fuel Cost Avoided" value={`₹${fmt(passenger?.totalFuelCostSavingsINR, 0)}`} color="border-yellow-400" />
             </div>
           )}
           {hasPassengerActivity && (

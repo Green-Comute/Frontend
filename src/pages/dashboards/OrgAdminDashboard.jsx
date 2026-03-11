@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, CheckCircle, Car, Trash2, UserX, Eye } from "lucide-react";
+import { Users, CheckCircle, Car, Trash2, UserX, Eye, FileWarning } from "lucide-react";
 import { registerPasskey } from "../../services/passkeyService";
+import { ASSETS_BASE_URL } from '../../config/api.config';
 
 const OrgAdminDashboard = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const OrgAdminDashboard = () => {
     const fetchPendingUsers = async () => {
       try {
         const res = await fetch(
-          "http://localhost:5000/org-admin/pending-users",
+          `${ASSETS_BASE_URL}/org-admin/pending-users`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -47,7 +48,7 @@ const OrgAdminDashboard = () => {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const res = await fetch("http://localhost:5000/org-admin/members", {
+        const res = await fetch(`${ASSETS_BASE_URL}/org-admin/members`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
@@ -71,7 +72,7 @@ const OrgAdminDashboard = () => {
   const approveUser = async (userId) => {
     try {
       const res = await fetch(
-        "http://localhost:5000/org-admin/approve-user",
+        `${ASSETS_BASE_URL}/org-admin/approve-user`,
         {
           method: "POST",
           headers: {
@@ -108,7 +109,7 @@ const OrgAdminDashboard = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/org-admin/remove-user/${userId}`,
+        `${ASSETS_BASE_URL}/org-admin/remove-user/${userId}`,
         {
           method: "DELETE",
           headers: {
@@ -134,15 +135,35 @@ const OrgAdminDashboard = () => {
   };
 
   if (loading) {
-    return <p className="p-8">Loading pending users...</p>;
+    return (
+      <div className="page-container animate-fade-in">
+        <div className="h-10 w-72 skeleton rounded mb-6" />
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="card p-5 space-y-3">
+              <div className="h-4 skeleton rounded w-3/4" />
+              <div className="h-4 skeleton rounded w-1/2" />
+              <div className="h-8 skeleton rounded w-24" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <p className="p-8 text-red-600">{error}</p>;
+    return (
+      <div className="page-container animate-fade-in">
+        <div className="empty-state">
+          <svg className="w-12 h-12 text-red-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <p className="text-red-600 font-medium">{error}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 p-8">
+    <div className="page-container animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
@@ -154,30 +175,36 @@ const OrgAdminDashboard = () => {
       <div className="flex items-center gap-2">
           <button
             onClick={() => navigate('/admin/trips')}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium shadow-sm border"
+            className="btn-secondary flex items-center gap-2 text-sm"
           >
             <Car className="w-4 h-4" /> View All Org Rides
           </button>
           <button
             onClick={() => navigate("/admin/driver-requests")}
-            className="flex items-center gap-2 px-4 py-2 bg-stone-800 text-white rounded-lg hover:bg-stone-900 transition font-medium"
+            className="btn-secondary flex items-center gap-2 text-sm"
           >
             <Car className="w-4 h-4" />
             Driver Requests
           </button>
           <button
             onClick={() => navigate('/org-admin/esg')}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-medium shadow-sm"
+            className="btn-primary flex items-center gap-2 text-sm"
           >
-            🌿 ESG Dashboard
+            ESG Dashboard
+          </button>
+          <button
+            onClick={() => navigate('/admin/incidents')}
+            className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition font-medium shadow-sm text-sm"
+          >
+            <FileWarning className="w-4 h-4" /> Incident Reports
           </button>
         </div>
       </div>
 
       {/* Pending Count */}
-      <div className="mt-8 mb-4 text-sm text-stone-600">
+      <div className="mt-6 mb-4 text-sm text-stone-600">
         Pending approvals: {" "}
-        <span className="font-semibold text-emerald-700">{users.length}</span>
+        <span className="badge-warning">{users.length}</span>
       </div>
 
       {/* Pending Users */}
@@ -190,14 +217,14 @@ const OrgAdminDashboard = () => {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto bg-white rounded-xl shadow border">
+          <div className="overflow-x-auto card">
             <table className="w-full border-collapse">
-              <thead className="bg-stone-100">
-                <tr className="border-b">
-                  <th className="text-left p-4">Email</th>
-                  <th className="text-left p-4">Phone</th>
-                  <th className="text-left p-4">Joined</th>
-                  <th className="text-left p-4">Action</th>
+              <thead className="bg-stone-50">
+                <tr className="border-b border-stone-200">
+                  <th className="text-left p-4 text-sm font-medium text-stone-600">Email</th>
+                  <th className="text-left p-4 text-sm font-medium text-stone-600">Phone</th>
+                  <th className="text-left p-4 text-sm font-medium text-stone-600">Joined</th>
+                  <th className="text-left p-4 text-sm font-medium text-stone-600">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -211,7 +238,7 @@ const OrgAdminDashboard = () => {
                     <td className="p-4">
                       <button
                         onClick={() => approveUser(u._id)}
-                        className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
+                        className="btn-primary text-sm px-4 py-2"
                       >
                         Approve
                       </button>
@@ -237,22 +264,29 @@ const OrgAdminDashboard = () => {
         </div>
 
         {membersLoading ? (
-          <p className="text-stone-600">Loading members...</p>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="card p-4 space-y-2">
+                <div className="h-4 skeleton rounded w-3/4" />
+                <div className="h-4 skeleton rounded w-1/2" />
+              </div>
+            ))}
+          </div>
         ) : members.length === 0 ? (
           <div className="bg-stone-100 border border-stone-200 p-6 rounded-xl">
             <p className="text-stone-600">No approved members yet.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto bg-white rounded-xl shadow border">
+          <div className="overflow-x-auto card">
             <table className="w-full border-collapse">
-              <thead className="bg-stone-100">
-                <tr className="border-b">
-                  <th className="text-left p-4">Email</th>
-                  <th className="text-left p-4">Name</th>
-                  <th className="text-left p-4">Phone</th>
-                  <th className="text-left p-4">Driver</th>
-                  <th className="text-left p-4">Joined</th>
-                  <th className="text-left p-4">Action</th>
+              <thead className="bg-stone-50">
+                <tr className="border-b border-stone-200">
+                  <th className="text-left p-4 text-sm font-medium text-stone-600">Email</th>
+                  <th className="text-left p-4 text-sm font-medium text-stone-600">Name</th>
+                  <th className="text-left p-4 text-sm font-medium text-stone-600">Phone</th>
+                  <th className="text-left p-4 text-sm font-medium text-stone-600">Driver</th>
+                  <th className="text-left p-4 text-sm font-medium text-stone-600">Joined</th>
+                  <th className="text-left p-4 text-sm font-medium text-stone-600">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -263,10 +297,7 @@ const OrgAdminDashboard = () => {
                     <td className="p-4 text-sm">{m.phone}</td>
                     <td className="p-4">
                       <span
-                        className={`text-xs px-2 py-1 rounded ${m.isDriver
-                          ? "bg-green-100 text-green-700"
-                          : "bg-stone-100 text-stone-500"
-                          }`}
+                        className={m.isDriver ? "badge-success" : "badge-neutral"}
                       >
                         {m.isDriver ? "Yes" : "No"}
                       </span>
@@ -300,19 +331,19 @@ const OrgAdminDashboard = () => {
         )}
       </section>
 
-      {/* 🔑 Security / Passkey */}
-      <section className="mt-8 bg-white border rounded-xl p-6 shadow-sm">
-        <h2 className="text-lg font-semibold mb-2">🔑 Security</h2>
+      {/* Security / Passkey */}
+      <section className="mt-8 card p-6">
+        <h2 className="section-title">Security</h2>
         <p className="text-sm text-stone-600 mb-4">
           Register a passkey (Touch ID / Face ID) to sign in without a password.
         </p>
         <button
           onClick={handleRegisterPasskey}
           disabled={passkeyStatus === "loading"}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+          className="btn-primary flex items-center gap-2"
         >
           {passkeyStatus === "loading"
-            ? "Registering..."
+            ? <><span className="spinner" /> Registering...</>
             : "Register a Passkey"}
         </button>
         {passkeyStatus === "success" && (

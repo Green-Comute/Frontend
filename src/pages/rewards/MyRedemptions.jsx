@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock, ArrowLeft, Image as ImageIcon, CircleCheck, CircleX, Loader2 } from 'lucide-react';
 import { gamificationService } from '../../services/gamificationService';
+import { ASSETS_BASE_URL } from '../../config/api.config';
 
 /**
  * Story 4.15 — User's redemption history
@@ -28,7 +29,7 @@ const MyRedemptions = () => {
     };
 
     return (
-        <div className="min-h-screen bg-stone-50 p-6 md:p-8">
+        <div className="min-h-screen bg-stone-50 p-6 md:p-8 animate-fade-in">
             <div className="max-w-4xl mx-auto">
                 <button onClick={() => navigate('/rewards')} className="flex items-center gap-2 text-stone-500 hover:text-stone-700 mb-6 transition">
                     <ArrowLeft className="w-4 h-4" /> Back to Catalog
@@ -47,7 +48,7 @@ const MyRedemptions = () => {
                 {error && <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200">{error}</div>}
 
                 {loading ? (
-                    <div className="p-12 text-center text-stone-500">Loading history...</div>
+                    <div className="p-12 text-center text-stone-500"><div className="spinner mx-auto"></div><p className="mt-4">Loading history...</p></div>
                 ) : redemptions.length === 0 ? (
                     <div className="bg-white rounded-xl border shadow-sm p-12 text-center justify-center flex flex-col items-center gap-4">
                         <Clock className="w-12 h-12 text-stone-300" />
@@ -64,7 +65,7 @@ const MyRedemptions = () => {
                                     {/* Image Thumbnail */}
                                     <div className="w-16 h-16 shrink-0 bg-stone-100 rounded-lg flex items-center justify-center border overflow-hidden">
                                         {r.rewardItemId?.imageUrl ? (
-                                            <img src={`http://localhost:5000/${r.rewardItemId.imageUrl}`} alt="" className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
+                                            <img src={`${ASSETS_BASE_URL}/${r.rewardItemId.imageUrl}`} alt="" className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
                                         ) : (
                                             <ImageIcon className="w-6 h-6 text-stone-300" />
                                         )}

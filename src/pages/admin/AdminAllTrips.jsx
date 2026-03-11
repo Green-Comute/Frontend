@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Car, MapPin, Users, Calendar, ArrowLeft } from "lucide-react";
+import { API_BASE_URL } from '../../config/api.config';
 
 const fetchAllTrips = async () => {
     const token = localStorage.getItem("authToken");
-    const res = await fetch(`http://localhost:5000/api/trips/admin/all`, {
+    const res = await fetch(`${API_BASE_URL}/trips/admin/all`, {
         headers: { Authorization: `Bearer ${token}` }
     });
     if (!res.ok) throw new Error("Failed to fetch trips");
@@ -28,7 +29,7 @@ const AdminAllTrips = () => {
     if (error) return <div className="p-12 text-center text-red-600">{error}</div>;
 
     return (
-        <div className="min-h-screen bg-stone-50 p-6 md:p-8">
+        <div className="min-h-screen bg-stone-50 p-6 md:p-8 animate-fade-in">
             <div className="max-w-6xl mx-auto space-y-6">
 
                 {/* Header */}

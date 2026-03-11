@@ -140,7 +140,7 @@ const RoutePreview = ({
           <button
             onClick={handleOptimize}
             disabled={isOptimizing}
-            className="px-3 py-1 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
+            className="px-3 py-1 text-xs bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:bg-gray-400"
           >
             {isOptimizing ? 'Optimizing...' : 'Optimize Route'}
           </button>

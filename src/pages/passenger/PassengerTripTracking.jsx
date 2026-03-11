@@ -2,10 +2,12 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { rideService } from '../../services/rideService';
 import { tripService } from '../../services/tripService';
+import { safetyService } from '../../services/safetyService';
 import LiveTrackingMap from '../../components/LiveTrackingMap';
 import TripSummary from '../../components/TripSummary';
 import { io } from 'socket.io-client';
 import calculateETA from '../../services/etaService';
+import { SOCKET_URL } from '../../config/api.config';
 
 const PassengerTripTracking = () => {
   const { rideId } = useParams();
@@ -20,6 +22,9 @@ const PassengerTripTracking = () => {
   const [cancelSuccess, setCancelSuccess] = useState(false);
   const [tripCancelledAlert, setTripCancelledAlert] = useState(null);
   const [showSummary, setShowSummary] = useState(false);
+  const [shareLink, setShareLink] = useState('');
+  const [shareCopied, setShareCopied] = useState(false);
+  const [shareLoading, setShareLoading] = useState(false);
   const tripRef = useRef(null);
   const rideRef = useRef(null);
 
@@ -62,7 +67,7 @@ const PassengerTripTracking = () => {
     if (!ride) return;
 
     const token = localStorage.getItem('authToken');
-    const newSocket = io('http://localhost:5000', {
+    const newSocket = io(SOCKET_URL, {
       auth: { token }
     });
 
@@ -143,6 +148,22 @@ const PassengerTripTracking = () => {
       }
     };
   }, [ride, rideId]);
+
+  const handleShareTrip = async () => {
+    try {
+      setShareLoading(true);
+      const res = await safetyService.createShareLink(trip._id);
+      const url = res.trackingUrl ?? res.data?.trackingUrl ?? '';
+      setShareLink(url);
+      await navigator.clipboard.writeText(url);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 3000);
+    } catch (err) {
+      setError(err.message || 'Failed to generate share link');
+    } finally {
+      setShareLoading(false);
+    }
+  };
 
   const handleCancelRide = async () => {
     if (!window.confirm('Are you sure you want to cancel your ride? This action cannot be undone.')) {
@@ -227,10 +248,10 @@ const PassengerTripTracking = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading trip details...</p>
+          <div className="spinner mx-auto"></div>
+          <p className="mt-4 text-stone-600">Loading trip details...</p>
         </div>
       </div>
     );
@@ -238,15 +259,15 @@ const PassengerTripTracking = () => {
 
   if (error || !ride || !trip) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="min-h-screen bg-stone-50 py-8 px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <div className="text-red-600 text-5xl mb-4">⚠️</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Error Loading Trip</h2>
-            <p className="text-gray-600 mb-6">{error || 'Ride not found'}</p>
+          <div className="card p-8 text-center">
+            <svg className="w-12 h-12 text-red-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>
+            <h2 className="text-2xl font-bold text-stone-900 mb-2">Error Loading Trip</h2>
+            <p className="text-stone-600 mb-6">{error || 'Ride not found'}</p>
             <button
               onClick={() => navigate('/dashboard')}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="btn-primary"
             >
               Back to Dashboard
             </button>
@@ -269,17 +290,17 @@ const PassengerTripTracking = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="min-h-screen bg-stone-50 py-8 px-4 animate-fade-in">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Track Your Ride</h1>
-            <p className="text-gray-600 mt-1">Real-time trip status and location</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight">Track Your Ride</h1>
+            <p className="text-stone-600 mt-1">Real-time trip status and location</p>
           </div>
           <button
             onClick={() => navigate('/dashboard')}
-            className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
+            className="btn-secondary"
           >
             ← Back
           </button>
@@ -287,8 +308,8 @@ const PassengerTripTracking = () => {
 
         {/* Driver-cancelled alert banner */}
         {tripCancelledAlert && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg flex items-start space-x-3">
-            <span className="text-red-500 text-xl">🚫</span>
+          <div className="mb-6 p-4 bg-red-50 border border-red-300 rounded-xl flex items-start gap-3" role="alert">
+            <svg className="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" /></svg>
             <div>
               <p className="font-semibold text-red-700">Trip Cancelled by Driver</p>
               <p className="text-red-600 text-sm mt-1">{tripCancelledAlert}</p>
@@ -299,57 +320,44 @@ const PassengerTripTracking = () => {
 
         {/* Passenger cancel success banner */}
         {cancelSuccess && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-300 rounded-lg flex items-center space-x-3">
-            <span className="text-green-500 text-xl">✓</span>
+          <div className="mb-6 p-4 bg-emerald-50 border border-emerald-300 rounded-xl flex items-center gap-3" role="status">
+            <svg className="w-5 h-5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
             <div>
-              <p className="font-semibold text-green-700">Ride Cancelled Successfully</p>
-              <p className="text-green-600 text-sm">Redirecting to dashboard…</p>
+              <p className="font-semibold text-emerald-700">Ride Cancelled Successfully</p>
+              <p className="text-emerald-600 text-sm">Redirecting to dashboard…</p>
             </div>
           </div>
         )}
 
         {/* Status Card */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="card p-6 mb-6">
           <div className="text-center">
-            <div className="text-6xl mb-4">{statusInfo.icon}</div>
             <h2 className={`text-2xl font-bold mb-2 text-${statusInfo.color}-700`}>
               {statusInfo.text}
             </h2>
-            <p className="text-gray-600 text-lg">{statusInfo.message}</p>
+            <p className="text-stone-600 text-lg">{statusInfo.message}</p>
 
             {/* ── Inline ETA badge (only when trip is active, not dropped off, and we have data) ── */}
             {trip.status === 'STARTED' && ride.pickupStatus !== 'DROPPED_OFF' && eta && (
-              <div
-                style={{
-                  marginTop: '20px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '16px',
-                  background: 'linear-gradient(135deg, #1e3a5f 0%, #0f2040 100%)',
-                  borderRadius: '14px',
-                  padding: '14px 24px',
-                  color: '#fff',
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.18)',
-                }}
-              >
-                <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontSize: '11px', opacity: 0.65, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Arrives in</div>
-                  <div style={{ fontSize: '26px', fontWeight: 800, color: '#63b3ed', lineHeight: 1 }}>
+              <div className="mt-5 inline-flex items-center gap-4 bg-gradient-to-br from-stone-800 to-stone-900 rounded-xl px-6 py-3.5 text-white shadow-lg">
+                <div className="text-left">
+                  <div className="text-[11px] uppercase tracking-wider text-stone-400">Arrives in</div>
+                  <div className="text-2xl font-extrabold text-emerald-400 leading-none">
                     {eta.etaText}
                   </div>
                   {eta.fallback && (
-                    <div style={{ fontSize: '10px', opacity: 0.45 }}>≈ estimated</div>
+                    <div className="text-[10px] text-stone-500">≈ estimated</div>
                   )}
                 </div>
-                <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.15)' }} />
-                <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontSize: '11px', opacity: 0.65, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Remaining</div>
-                  <div style={{ fontSize: '20px', fontWeight: 700, color: '#9ae6b4', lineHeight: 1 }}>
+                <div className="w-px h-10 bg-white/15" />
+                <div className="text-left">
+                  <div className="text-[11px] uppercase tracking-wider text-stone-400">Remaining</div>
+                  <div className="text-xl font-bold text-emerald-300 leading-none">
                     {eta.distanceText}
                   </div>
                 </div>
                 {etaLastUpdated && (
-                  <div style={{ fontSize: '10px', opacity: 0.4, marginLeft: '4px', alignSelf: 'flex-end' }}>
+                  <div className="text-[10px] text-stone-500 ml-1 self-end">
                     · refreshes 60s
                   </div>
                 )}
@@ -358,21 +366,8 @@ const PassengerTripTracking = () => {
 
             {/* Waiting for ETA */}
             {trip.status === 'STARTED' && ride.pickupStatus !== 'DROPPED_OFF' && !eta && (
-              <div
-                style={{
-                  marginTop: '16px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  background: '#f7fafc',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '10px',
-                  padding: '10px 18px',
-                  color: '#718096',
-                  fontSize: '13px',
-                }}
-              >
-                <span style={{ fontSize: '16px' }}>⏳</span>
+              <div className="mt-4 inline-flex items-center gap-2 bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-stone-500 text-sm">
+                <div className="animate-pulse-dot" />
                 Calculating ETA — waiting for driver location…
               </div>
             )}
@@ -380,51 +375,51 @@ const PassengerTripTracking = () => {
         </div>
 
         {/* Trip Details Card */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h3 className="font-semibold text-gray-900 mb-4 text-lg">Trip Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="card p-6 mb-6">
+          <h3 className="font-semibold text-stone-900 mb-4 text-lg">Trip Information</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-3">Route</h4>
+              <h4 className="text-sm font-medium text-stone-700 mb-3">Route</h4>
               <div className="space-y-3">
-                <div className="flex items-start space-x-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full mt-1 flex-shrink-0"></div>
+                <div className="flex items-start gap-2">
+                  <div className="w-3 h-3 bg-emerald-500 rounded-full mt-1 shrink-0"></div>
                   <div>
-                    <div className="text-sm text-gray-600">Pickup</div>
-                    <div className="font-medium text-gray-900">{trip.source}</div>
+                    <div className="text-sm text-stone-500">Pickup</div>
+                    <div className="font-medium text-stone-900">{trip.source}</div>
                   </div>
                 </div>
-                <div className="flex items-start space-x-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full mt-1 flex-shrink-0"></div>
+                <div className="flex items-start gap-2">
+                  <div className="w-3 h-3 bg-red-500 rounded-full mt-1 shrink-0"></div>
                   <div>
-                    <div className="text-sm text-gray-600">Destination</div>
-                    <div className="font-medium text-gray-900">{trip.destination}</div>
+                    <div className="text-sm text-stone-500">Destination</div>
+                    <div className="font-medium text-stone-900">{trip.destination}</div>
                   </div>
                 </div>
               </div>
             </div>
             <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-3">Driver & Vehicle</h4>
+              <h4 className="text-sm font-medium text-stone-700 mb-3">Driver & Vehicle</h4>
               <div className="space-y-2">
                 <div>
-                  <span className="text-sm text-gray-600">Driver:</span>
-                  <p className="font-medium text-gray-900">
+                  <span className="text-sm text-stone-500">Driver:</span>
+                  <p className="font-medium text-stone-900">
                     {trip.driverId?.name || 'Unknown'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-600">Vehicle:</span>
-                  <p className="font-medium text-gray-900">{trip.vehicleType}</p>
+                  <span className="text-sm text-stone-500">Vehicle:</span>
+                  <p className="font-medium text-stone-900">{trip.vehicleType}</p>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-600">Scheduled:</span>
-                  <p className="font-medium text-gray-900">
+                  <span className="text-sm text-stone-500">Scheduled:</span>
+                  <p className="font-medium text-stone-900">
                     {new Date(trip.scheduledTime).toLocaleString()}
                   </p>
                 </div>
                 {trip.actualStartTime && (
                   <div>
-                    <span className="text-sm text-gray-600">Started at:</span>
-                    <p className="font-medium text-gray-900">
+                    <span className="text-sm text-stone-500">Started at:</span>
+                    <p className="font-medium text-stone-900">
                       {new Date(trip.actualStartTime).toLocaleString()}
                     </p>
                   </div>
@@ -441,13 +436,37 @@ const PassengerTripTracking = () => {
           </div>
         )}
 
+        {/* Share trip link — visible while trip is active */}
+        {trip.status === 'STARTED' && ride.pickupStatus !== 'DROPPED_OFF' && (
+          <div className="card p-4 mb-6 flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-semibold text-stone-900 text-sm">Share your trip</p>
+                <p className="text-xs text-stone-500">Let someone track this ride in real time</p>
+              </div>
+              <button
+                onClick={handleShareTrip}
+                disabled={shareLoading}
+                className="btn-primary text-sm disabled:opacity-50 flex items-center gap-2"
+              >
+                {shareLoading ? 'Generating…' : shareCopied ? '✓ Copied!' : 'Share Link'}
+              </button>
+            </div>
+            {shareLink && (
+              <div className="p-2 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-700 break-all select-all">
+                {shareLink}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Passenger Cancel Ride – only when trip is SCHEDULED and ride is cancellable */}
         {trip.status === 'SCHEDULED' &&
           (ride.status === 'PENDING' || ride.status === 'APPROVED') &&
           !cancelSuccess && (
-            <div className="bg-white rounded-lg shadow-md p-6 mt-6 border border-red-100">
-              <h3 className="font-semibold text-gray-900 mb-2">Need to cancel?</h3>
-              <p className="text-sm text-gray-600 mb-4">
+            <div className="card p-6 mt-6 border-red-100">
+              <h3 className="font-semibold text-stone-900 mb-2">Need to cancel?</h3>
+              <p className="text-sm text-stone-600 mb-4">
                 You can cancel your ride request while the trip has not yet started.
                 {ride.status === 'APPROVED' && (
                   <span className="ml-1 text-amber-600 font-medium">
@@ -462,35 +481,35 @@ const PassengerTripTracking = () => {
                 id="passenger-cancel-ride-btn"
                 onClick={handleCancelRide}
                 disabled={cancelLoading}
-                className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed font-medium text-sm"
+                className="btn-danger text-sm"
               >
-                {cancelLoading ? 'Cancelling…' : '✕ Cancel My Ride'}
+                {cancelLoading ? 'Cancelling…' : 'Cancel My Ride'}
               </button>
             </div>
           )}
 
         {/* Timeline for pickup status */}
         {trip.status === 'STARTED' && (
-          <div className="bg-white rounded-lg shadow-md p-6 mt-6">
-            <h3 className="font-semibold text-gray-900 mb-4">Journey Progress</h3>
+          <div className="card p-6 mt-6">
+            <h3 className="font-semibold text-stone-900 mb-4">Journey Progress</h3>
             <div className="flex items-center justify-between">
-              <div className={`flex flex-col items-center ${ride.pickupStatus !== 'WAITING' ? 'text-green-600' : 'text-gray-400'
+              <div className={`flex flex-col items-center ${ride.pickupStatus !== 'WAITING' ? 'text-emerald-600' : 'text-stone-400'
                 }`}>
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${ride.pickupStatus !== 'WAITING' ? 'bg-green-100' : 'bg-gray-100'
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${ride.pickupStatus !== 'WAITING' ? 'bg-emerald-100' : 'bg-stone-100'
                   }`}>
                   ✓
                 </div>
                 <p className="text-sm mt-2 font-medium">Picked Up</p>
               </div>
-              <div className="flex-1 h-1 mx-4 bg-gray-200">
-                <div className={`h-full ${ride.pickupStatus === 'PICKED_UP' || ride.pickupStatus === 'DROPPED_OFF'
-                  ? 'bg-green-500'
-                  : 'bg-gray-200'
+              <div className="flex-1 h-1 mx-4 bg-stone-200">
+                <div className={`h-full transition-all duration-500 ${ride.pickupStatus === 'PICKED_UP' || ride.pickupStatus === 'DROPPED_OFF'
+                  ? 'bg-emerald-500'
+                  : 'bg-stone-200'
                   }`} style={{ width: ride.pickupStatus === 'PICKED_UP' ? '50%' : ride.pickupStatus === 'DROPPED_OFF' ? '100%' : '0%' }}></div>
               </div>
-              <div className={`flex flex-col items-center ${ride.pickupStatus === 'DROPPED_OFF' ? 'text-green-600' : 'text-gray-400'
+              <div className={`flex flex-col items-center ${ride.pickupStatus === 'DROPPED_OFF' ? 'text-emerald-600' : 'text-stone-400'
                 }`}>
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${ride.pickupStatus === 'DROPPED_OFF' ? 'bg-green-100' : 'bg-gray-100'
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${ride.pickupStatus === 'DROPPED_OFF' ? 'bg-emerald-100' : 'bg-stone-100'
                   }`}>
                   ✓
                 </div>

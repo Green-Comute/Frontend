@@ -1,55 +1,73 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+// Shared loading fallback
+const PageLoader = () => (
+  <div className="min-h-[60vh] flex items-center justify-center">
+    <div className="spinner" />
+  </div>
+);
+
 // Epic-1 Pages
-import LandingPage from "./pages/LandingPage";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import AwaitingApproval from "./pages/AwaitingApproval";
-import CompleteProfile from "./pages/CompleteProfile";
-import Dashboard from "./pages/Dashboard";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import AdminDriverRequests from "./pages/AdminDriverRequests";
-import DriverUpload from "./pages/DriverUpload";
+const LandingPage = lazy(() => import("./pages/LandingPage"));
+const Login = lazy(() => import("./pages/Login"));
+const Signup = lazy(() => import("./pages/Signup"));
+const AwaitingApproval = lazy(() => import("./pages/AwaitingApproval"));
+const CompleteProfile = lazy(() => import("./pages/CompleteProfile"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const AdminDriverRequests = lazy(() => import("./pages/AdminDriverRequests"));
+const DriverUpload = lazy(() => import("./pages/DriverUpload"));
 
 // Epic-2 Driver Pages
-import CreateTrip from './pages/driver/CreateTrip';
-import RideRequests from './pages/driver/RideRequests';
-import ActiveTrip from './pages/driver/ActiveTrip';
-import TestMockTrip from './pages/driver/TestMockTrip';
+const CreateTrip = lazy(() => import('./pages/driver/CreateTrip'));
+const RideRequests = lazy(() => import('./pages/driver/RideRequests'));
+const ActiveTrip = lazy(() => import('./pages/driver/ActiveTrip'));
+const TestMockTrip = lazy(() => import('./pages/driver/TestMockTrip'));
 
 // Epic-2 Passenger Pages
-import SearchTrips from './pages/passenger/SearchTrips';
-import PassengerTripTracking from './pages/passenger/PassengerTripTracking';
+const SearchTrips = lazy(() => import('./pages/passenger/SearchTrips'));
+const PassengerTripTracking = lazy(() => import('./pages/passenger/PassengerTripTracking'));
 
 // Epic-3 ESG / Impact Pages
-import MyImpact from './pages/impact/MyImpact';
-import OrgEsgDashboard from './pages/esg/OrgEsgDashboard';
-import PlatformEsgDashboard from './pages/esg/PlatformEsgDashboard';
+const MyImpact = lazy(() => import('./pages/impact/MyImpact'));
+const OrgEsgDashboard = lazy(() => import('./pages/esg/OrgEsgDashboard'));
+const PlatformEsgDashboard = lazy(() => import('./pages/esg/PlatformEsgDashboard'));
 
 // Epic-4 Gamification & Rewards
-import PointsHistory from './pages/gamification/PointsHistory';
-import TierProgress from './pages/gamification/TierProgress';
-import Leaderboard from './pages/gamification/Leaderboard';
-import RewardsCatalog from './pages/rewards/RewardsCatalog';
-import MyRedemptions from './pages/rewards/MyRedemptions';
-import PrivacySettings from './pages/settings/PrivacySettings';
+const PointsHistory = lazy(() => import('./pages/gamification/PointsHistory'));
+const TierProgress = lazy(() => import('./pages/gamification/TierProgress'));
+const Leaderboard = lazy(() => import('./pages/gamification/Leaderboard'));
+const RewardsCatalog = lazy(() => import('./pages/rewards/RewardsCatalog'));
+const MyRedemptions = lazy(() => import('./pages/rewards/MyRedemptions'));
+const PrivacySettings = lazy(() => import('./pages/settings/PrivacySettings'));
 // Admin
-import RewardsCRUD from './pages/admin/RewardsCRUD';
-import RedemptionQueue from './pages/admin/RedemptionQueue';
-import TierConfigPage from './pages/admin/TierConfig';
-import AdminUserView from './pages/admin/AdminUserView';
-import AdminAllTrips from './pages/admin/AdminAllTrips';
+const RewardsCRUD = lazy(() => import('./pages/admin/RewardsCRUD'));
+const RedemptionQueue = lazy(() => import('./pages/admin/RedemptionQueue'));
+const TierConfigPage = lazy(() => import('./pages/admin/TierConfig'));
+const AdminUserView = lazy(() => import('./pages/admin/AdminUserView'));
+const AdminAllTrips = lazy(() => import('./pages/admin/AdminAllTrips'));
 // Platform
-import PointRulesDashboard from './pages/platform/PointRulesDashboard';
+const PointRulesDashboard = lazy(() => import('./pages/platform/PointRulesDashboard'));
+
+// Epic-5 Privacy, Safety & Feedback
+const RateTrip = lazy(() => import('./pages/trip/RateTrip'));
+const PublicTripTracking = lazy(() => import('./pages/trip/PublicTripTracking'));
+const SafetyHub = lazy(() => import('./pages/safety/SafetyHub'));
+const SafetyGuidelines = lazy(() => import('./pages/safety/SafetyGuidelines'));
+const SupportTickets = lazy(() => import('./pages/support/SupportTickets'));
+const IncidentReview = lazy(() => import('./pages/admin/IncidentReview'));
+const GuidelinesAdmin = lazy(() => import('./pages/admin/GuidelinesAdmin'));
 
 function App() {
   return (
     <Router>
       <Layout>
+        <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* Public */}
           <Route path="/" element={<LandingPage />} />
@@ -192,8 +210,22 @@ function App() {
 
           <Route path="/platform/point-rules" element={<ProtectedRoute role="PLATFORM_ADMIN"><PointRulesDashboard /></ProtectedRoute>} />
 
+          {/* Epic-5 Privacy, Safety & Feedback */}
+          {/* Public — no auth needed */}
+          <Route path="/track/:token" element={<PublicTripTracking />} />
+
+          {/* Authenticated user routes */}
+          <Route path="/trip/:tripId/rate" element={<ProtectedRoute><RateTrip /></ProtectedRoute>} />
+          <Route path="/safety" element={<ProtectedRoute><SafetyHub /></ProtectedRoute>} />
+          <Route path="/safety/guidelines" element={<ProtectedRoute><SafetyGuidelines /></ProtectedRoute>} />
+          <Route path="/support/tickets" element={<ProtectedRoute><SupportTickets /></ProtectedRoute>} />
+
+          {/* Admin routes */}
+          <Route path="/admin/incidents" element={<ProtectedRoute role="ORG_ADMIN"><IncidentReview /></ProtectedRoute>} />
+          <Route path="/admin/guidelines" element={<ProtectedRoute role="ORG_ADMIN"><GuidelinesAdmin /></ProtectedRoute>} />
 
         </Routes>
+        </Suspense>
       </Layout>
     </Router>
   );

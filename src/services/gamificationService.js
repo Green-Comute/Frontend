@@ -1,4 +1,5 @@
 import apiRequest from './api.js';
+import { ASSETS_BASE_URL } from '../config/api.config';
 
 const getHeaders = () => ({
     'Content-Type': 'application/json',
@@ -6,7 +7,8 @@ const getHeaders = () => ({
 });
 
 const adminRequest = async (endpoint, options = {}) => {
-    const res = await fetch(`http://localhost:5000${endpoint}`, { ...options, headers: getHeaders() });
+    const base = ASSETS_BASE_URL;
+    const res = await fetch(`${base}${endpoint}`, { ...options, headers: getHeaders() });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'API request failed');
     return data;

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { User, Car, ArrowLeft, History, MapPin, Gift, Box } from "lucide-react";
+import { API_BASE_URL } from '../../config/api.config';
 
 /** Fetch directly since it's an admin route or use the existing api wrapper */
 const fetchUserDetails = async (id) => {
     const token = localStorage.getItem("authToken");
-    const res = await fetch(`http://localhost:5000/api/users/${id}/admin-details`, {
+    const res = await fetch(`${API_BASE_URL}/users/${id}/admin-details`, {
         headers: { Authorization: `Bearer ${token}` }
     });
     if (!res.ok) throw new Error("Failed to fetch user details");
@@ -32,7 +33,7 @@ const AdminUserView = () => {
     const { user, points, tripsOffered, ridesTaken, pointHistory, redemptions } = data;
 
     return (
-        <div className="min-h-screen bg-stone-50 p-6 md:p-8">
+        <div className="min-h-screen bg-stone-50 p-6 md:p-8 animate-fade-in">
             <div className="max-w-6xl mx-auto space-y-6">
 
                 {/* Header */}

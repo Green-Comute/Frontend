@@ -76,9 +76,9 @@ describe('FeatureCard Component', () => {
       />
     );
     
-    const iconContainer = container.querySelector('.w-14.h-14');
+    const iconContainer = container.querySelector('.w-12.h-12');
     expect(iconContainer).toBeInTheDocument();
-    expect(iconContainer).toHaveClass('bg-emerald-100', 'rounded-lg', 'flex', 'items-center');
+    expect(iconContainer).toHaveClass('bg-emerald-50', 'rounded-xl', 'flex', 'items-center');
   });
 
   it('should render title with correct styling', () => {
@@ -91,7 +91,7 @@ describe('FeatureCard Component', () => {
     );
     
     const title = screen.getByText('Test Title');
-    expect(title).toHaveClass('text-xl', 'font-semibold', 'text-stone-900', 'mb-3');
+    expect(title).toHaveClass('text-lg', 'font-semibold', 'text-stone-900', 'mb-2', 'leading-snug');
   });
 
   it('should render description with correct styling', () => {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ASSETS_BASE_URL } from '../config/api.config';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -12,7 +13,7 @@ const ForgotPassword = () => {
 
     try {
       const res = await fetch(
-        "http://localhost:5000/auth/forgot-password",
+        `${ASSETS_BASE_URL}/auth/forgot-password`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
