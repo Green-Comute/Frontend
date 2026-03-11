@@ -50,6 +50,20 @@ const ActiveTrip = () => {
 
   const user = getUserData();
 
+  const fetchOptimizedRoute = useCallback(async () => {
+    try {
+      setRouteLoading(true);
+      const routeData = await rideService.getOptimizedRoutePreview(tripId);
+      setOptimizedRoute(routeData.route);
+    } catch (err) {
+      // Non-critical error - route optimization may not be available yet
+      console.log('Route preview not available:', err.message);
+      setOptimizedRoute(null);
+    } finally {
+      setRouteLoading(false);
+    }
+  }, [tripId]);
+
   const fetchTripDetails = useCallback(async () => {
     try {
       setLoading(true);
@@ -65,21 +79,7 @@ const ActiveTrip = () => {
     } finally {
       setLoading(false);
     }
-  }, [tripId]);
-
-  const fetchOptimizedRoute = useCallback(async () => {
-    try {
-      setRouteLoading(true);
-      const routeData = await rideService.getOptimizedRoutePreview(tripId);
-      setOptimizedRoute(routeData.route);
-    } catch (err) {
-      // Non-critical error - route optimization may not be available yet
-      console.log('Route preview not available:', err.message);
-      setOptimizedRoute(null);
-    } finally {
-      setRouteLoading(false);
-    }
-  }, [tripId]);
+  }, [tripId, fetchOptimizedRoute]);
 
   useEffect(() => {
     fetchTripDetails();

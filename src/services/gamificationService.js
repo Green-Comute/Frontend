@@ -1,4 +1,5 @@
 import apiRequest from './api.js';
+import { ASSETS_BASE_URL } from '../config/api.config';
 
 const getHeaders = () => ({
     'Content-Type': 'application/json',
@@ -6,7 +7,6 @@ const getHeaders = () => ({
 });
 
 const adminRequest = async (endpoint, options = {}) => {
-    import { ASSETS_BASE_URL } from '../config/api.config';
     const base = ASSETS_BASE_URL;
     const res = await fetch(`${base}${endpoint}`, { ...options, headers: getHeaders() });
     const data = await res.json();
